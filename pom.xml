@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.yuewen.nrzx.albianj</groupId>
+    <artifactId>Albianj.Boot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <scm>
+        <developerConnection>scm:git:http://git.code.oa.com/albianj-framework/albianj-framework.git
+        </developerConnection>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.locales>zh_CN</project.build.locales>
+        <project.build.jdk>1.7</project.build.jdk>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>yw-qa</id>
+            <name>yw-qa</name>
+            <url>http://maven.yuewen.com/nexus/content/repositories/nrzx-releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>yw-qa-snapshot</id>
+            <name>yw-qa-snapshot</name>
+            <url>http://maven.yuewen.com/nexus/content/repositories/nrzx-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>yw-qa</id>
+            <name>yw-qa</name>
+            <url>http://maven.yuewen.com/nexus/content/groups/nrzx/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+</project>
