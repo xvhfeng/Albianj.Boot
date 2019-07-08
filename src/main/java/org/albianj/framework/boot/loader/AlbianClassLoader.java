@@ -37,118 +37,198 @@ Copyright (c) 2016 著作权由上海阅文信息技术有限公司所有。著�
 */
 package org.albianj.framework.boot.loader;
 
-import java.io.*;
-import java.nio.ByteBuffer;
+import org.albianj.framework.boot.BundleContext;
+import org.albianj.framework.boot.servants.CollectServant;
+import org.albianj.framework.boot.servants.ConvertServant;
+import org.albianj.framework.boot.servants.FileServant;
+import org.albianj.framework.boot.logging.LogServant;
+import org.albianj.framework.boot.logging.LoggerLevel;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-public class AlbianClassLoader extends ClassLoader {
-    private static Map<String, ByteBuffer> entryMap;
-    private static AlbianClassLoader _cl = null;
-    private JarInputStream jis;
 
-    public AlbianClassLoader() {
-        super();
-    }
+public class AlbianClassLoader extends BundleClassLoader {
 
-    public static synchronized AlbianClassLoader getInstance() {
-        if (null == _cl) {
-            _cl = new AlbianClassLoader();
-            entryMap = new HashMap<String, ByteBuffer>();
-        }
-        return _cl;
-    }
+    private Map<String, TypeFileMetadata> mapTypesInSpxLib;
 
-    public boolean existClass(String name) {
-        String path = name.replace('.', '/').concat(".class");
-        return entryMap.containsKey(path);
-    }
-
-    public void regeditPlugin(String src) throws FileNotFoundException, IOException {
-        regeditPlugin(new FileInputStream(src));
-    }
-
-    public void regeditPlugin(File file) throws FileNotFoundException, IOException {
-        regeditPlugin(new FileInputStream(file));
-    }
-
-    public void regeditPlugin(InputStream is) throws IOException {
-        jis = new JarInputStream(is);
-        JarEntry entry = null;
-        while ((entry = jis.getNextJarEntry()) != null) {
-            String name = entry.getName();
-            if (name.endsWith(".class")) { // class�ļ����ܺ��ٻ���
-                byte[] bytes = getBytes(jis); // ��ȡclass�ļ�����
-                ByteBuffer buffer = ByteBuffer.wrap(bytes); // ����ݸ��Ƶ�ByteBuffer������
-                entryMap.put(name, buffer); // �������
-            } else { // �����ļ�ֱ�ӻ���
-                byte[] bytes = getBytes(jis);
-                ByteBuffer buffer = ByteBuffer.wrap(bytes);
-                entryMap.put(name, buffer);
-            }
-        }
-        jis.close();
-    }
-
-    public void regeditPlugin(byte[] b) throws IOException {
-        jis = new JarInputStream(new ByteArrayInputStream(b));
-        JarEntry entry = null;
-        while ((entry = jis.getNextJarEntry()) != null) {
-            String name = entry.getName();
-
-            if (name.endsWith(".class")) { // class�ļ����ܺ��ٻ���
-                byte[] bytes = getBytes(jis); // ��ȡclass�ļ�����
-                ByteBuffer buffer = ByteBuffer.wrap(bytes); // ����ݸ��Ƶ�ByteBuffer������
-                entryMap.put(name, buffer); // �������
-            } else { // �����ļ�ֱ�ӻ���
-                byte[] bytes = getBytes(jis);
-                ByteBuffer buffer = ByteBuffer.wrap(bytes);
-                entryMap.put(name, buffer);
-            }
-        }
-        jis.close();
+    protected AlbianClassLoader(String bundleName) {
+        super(bundleName);
+        mapTypesInSpxLib = new HashMap<>();
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        String path = name.replace('.', '/').concat(".class");
-        ByteBuffer buffer = entryMap.get(path);
-        if (buffer == null) {
-            Class<?> c = Class.forName(path); //when use web container such as jetty then use
-            if (null != c) {
-                return c;
+    public void loadAllClass(BundleContext bctx) {
+        super.loadAllClass(bctx);
+        loadSpxLib(bctx);
+    }
+
+    private void loadSpxLib(BundleContext bctx) {
+        File f = findSpxFile(bctx);
+        checkSpxFileVersion(f);
+        Map<String,TypeFileMetadata> map = unpackSpxFile(f.getName());
+        mergerTypeFileMetadata(map,true);
+    }
+
+    private File findSpxFile(BundleContext bctx) {
+        List<File> files = FileServant.Instance.findFileBySuffix(bctx.getBinFolder(), ".spx");
+        if (null == files || 0 == files.size()) { // not found in bin folder
+            files = FileServant.Instance.findFileBySuffix(bctx.getLibFolder(), ".spx");
+        }
+
+        if (null == files) { // check isNull for find in lib folder
+            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                    this.getClass(), null,
+                    "Found SpxLib Fail", null,
+                    "Not Found albian.spx file in bin or lib folder at work folder {0},but the file must exist.please check it.",
+                    bctx.getWorkFolder());
+        }
+
+        if (2 >= files.size()) { // check isNull for find in lib folder
+                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                        this.getClass(), null,
+                        "Found SpxLib Fail", null,
+                        "Found {0} albian.spx file in bin or lib folder at work folder {1}.The file must be single.",
+                        files.size(), bctx.getWorkFolder());
+        }
+
+        File spxFile = files.get(0);
+
+        LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Mark,
+                this.getClass(), null,
+                "Load SpxFile", null,
+                "Load Albian spxFile -> {0}.", spxFile.getName());
+        return spxFile;
+    }
+
+    private boolean checkSpxFileVersion(File spxFile) {
+        String fname = spxFile.getName();
+        int begin = fname.indexOf("Albianj_");
+        int end = fname.indexOf(".spx");
+        String sVersion = fname.substring(begin + "Albianj_".length(), end);
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(spxFile);
+            byte[] bVersion = new byte[14];
+            fis.read(bVersion);
+            String sFVersion = bVersion.toString();
+            if (!sFVersion.equalsIgnoreCase(sVersion)) {
+                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                        this.getClass(), null,
+                        "SpxLib Version Fail", null,
+                        "albian.spx version is not same.file version -> {0} and packing version -> {1}.",
+                        sVersion,bVersion);
+                return false;
             }
-            return super.findClass(name);
-        } else {
-            byte[] bytes = buffer.array();
-            return defineClass(name, bytes, 0, bytes.length);
+            return true;
+        } catch (IOException e) {
+            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                    this.getClass(), e,
+                    "SpxLib Version Fail", null,
+                    "Open and read Albian.spx -> {0} is fail.",
+                    fname);
+            return false;
+        } finally {
+            if (null != fis) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
+                            this.getClass(), e,
+                            "SpxLib Version Fail", null,
+                            "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                            fname);
+                }
+            }
         }
     }
 
-    private byte[] getBytes(JarInputStream jis) throws IOException {
-        int len = 0;
-        byte[] bytes = new byte[8192];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
-        while ((len = jis.read(bytes, 0, bytes.length)) != -1) {
-            baos.write(bytes, 0, len);
+    private Map<String,TypeFileMetadata> unpackSpxFile(String fname) {
+        Map<String,TypeFileMetadata> map = new HashMap<>();
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(fname);
+            fis.skip(14);// skip version
+
+            ArrayList<byte[]> list = parserSpxFileToBytes(fis);
+            if (CollectServant.Instance.isNullOrEmpty(list)) {
+                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                        this.getClass(), null,
+                        "Parser SpxLib Error", null,
+                        "Parser Albian.spx -> {0} to bytes array is null or empty,maybe spx-file format is error or not accord with Albian.Loading .",
+                        fname);
+            }
+            for (byte[] bs : list) {
+                scanSingleJarInSpxLib(fname, "", bs, map);
+            }
+
+        } catch (IOException e) {
+            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                    this.getClass(), e,
+                    "Parser SpxLib Error", null,
+                    "Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
+                    fname);
+        } finally {
+            if (null != fis) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
+                            this.getClass(), e,
+                            "Parser SpxLib Fail", null,
+                            "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                            fname);
+                }
+            }
         }
-        return baos.toByteArray();
+        return map;
     }
 
-    /**
-     * �ر�Decoder
-     *
-     * @throws IOException
-     */
-    public void close() throws IOException {
-        Iterator<ByteBuffer> iterator = entryMap.values().iterator();
-        while (iterator.hasNext()) {
-            ByteBuffer buffer = iterator.next();
-            buffer.clear(); // ���ByteBuffer���󻺴�
+    private ArrayList<byte[]> parserSpxFileToBytes(FileInputStream fis) throws IOException {
+        ArrayList<byte[]> list = null;
+            list = new ArrayList<byte[]>();
+            byte[] bsize = new byte[4];
+            fis.read(bsize);
+            long size = ConvertServant.Instance.bytesToInt(bsize, 0);
+            for (int i = 0; i < size; i++) {
+                byte[] blength = new byte[8];
+                fis.read(blength);
+                long length = ConvertServant.Instance.bytesToLong(blength, 0);
+                byte[] ebytes = new byte[(int) length];
+                fis.read(ebytes);
+                list.add(ebytes);
+            }
+            return list;
+    }
+
+    public void scanSingleJarInSpxLib(String spxFilename, String jarFilename, byte[] b, Map<String, TypeFileMetadata> map) {
+        JarInputStream jis = null;
+        try {
+            jis = new JarInputStream(new ByteArrayInputStream(b));
+            sacnSingleJarBytes(spxFilename, jarFilename, map, jis);
+        } catch (IOException e) {
+            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
+                    this.getClass(), e,
+                    "Parser SpxLib Error", null,
+                    "Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
+                    spxFilename);
+        } finally {
+            try {
+                jis.close();
+            } catch (IOException e) {
+                LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
+                        this.getClass(), e,
+                        "Parser SpxLib Fail", null,
+                        "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                        spxFilename);
+            }
         }
-        entryMap.clear(); // ���HashMap
     }
 }

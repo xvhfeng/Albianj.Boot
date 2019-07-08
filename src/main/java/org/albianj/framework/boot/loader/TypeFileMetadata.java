@@ -1,6 +1,6 @@
 package org.albianj.framework.boot.loader;
 
-import org.albianj.boot.tags.BundleSharingTag;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -49,13 +49,18 @@ public class TypeFileMetadata {
     private String fullFileName;
 
     /**
+     * 该类来自于哪个文件夹，可能的有：bin，lib，classes与so（so只有albianj v1.0才具有)
+     */
+    private String fromFolder;
+
+    /**
      * @param fullFileName     带有.class后缀名和命名空间的完全文件名,文件系统格式
      * @param fileContentBytes 文件内容
      * @param parentFileName   class归属的parent名字 可能为目录名或者是jar
      * @param isParentJar      归属是目录还是jar
      * @return
      */
-    public static TypeFileMetadata makeClassFileMetadata(String fullFileName, byte[] fileContentBytes, String parentFileName, boolean isParentJar) {
+    public static TypeFileMetadata makeClassFileMetadata(String fullFileName, byte[] fileContentBytes, String parentFileName, boolean isParentJar,String fromFolder) {
         TypeFileMetadata cfm = new TypeFileMetadata();
         cfm.setFileContentBytes(fileContentBytes);
         cfm.setParentJar(isParentJar);
@@ -73,6 +78,7 @@ public class TypeFileMetadata {
         }
         String md5 = md5(fileContentBytes);
         cfm.setMd5(md5);
+        cfm.fromFolder = fromFolder;
         return cfm;
     }
 
@@ -155,5 +161,13 @@ public class TypeFileMetadata {
 
     public void setFullClassNameWithoutSuffix(String fullClassNameWithoutSuffix) {
         this.fullClassNameWithoutSuffix = fullClassNameWithoutSuffix;
+    }
+
+    public String getFromFolder() {
+        return fromFolder;
+    }
+
+    public void setFromFolder(String from) {
+        this.fromFolder = from;
     }
 }

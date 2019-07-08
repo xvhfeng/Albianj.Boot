@@ -1,7 +1,7 @@
 package org.albianj.framework.boot.except;
 
 
-import org.albianj.framework.boot.helpers.StringServant;
+import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.util.Stack;

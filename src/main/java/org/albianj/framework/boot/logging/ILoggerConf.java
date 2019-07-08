@@ -4,7 +4,7 @@ package org.albianj.framework.boot.logging;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 @BundleSharingTag
-public interface ILoggerAttribute {
+public interface ILoggerConf {
     String getLoggerName();
 
     void setLoggerName(String loggerName);

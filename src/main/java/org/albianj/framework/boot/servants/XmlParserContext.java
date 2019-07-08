@@ -1,4 +1,4 @@
-package org.albianj.framework.boot.helpers;
+package org.albianj.framework.boot.servants;
 
 import org.albianj.framework.boot.logging.LogServant;
 import org.albianj.framework.boot.logging.LoggerLevel;

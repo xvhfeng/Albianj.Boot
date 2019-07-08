@@ -1,6 +1,7 @@
 package org.albianj.framework.boot;
 
-import org.albianj.framework.boot.entry.BootAttribute;
+import org.albianj.framework.boot.confs.AppConf;
+import org.albianj.framework.boot.loader.AlbianClassLoader;
 import org.albianj.framework.boot.loader.BundleClassLoader;
 import org.albianj.framework.boot.logging.ILogger;
 import org.albianj.framework.boot.logging.LogServant;
@@ -16,43 +17,74 @@ import java.lang.reflect.Method;
 @BundleSharingTag
 public class BundleContext {
 
-    /**
-     * bundle的名称
-     */
     private String bundleName;
-
-    /**
-     * 该bundle的classloader
-     */
     private ClassLoader classLoader;
-
     private ThreadGroup threadGroup;
+    private String startupType;
+    private ILogger runtimeLogger;
 
-    /**
-     * bundle的启动器
-     *
-     */
-    private String launcher;
+    private IBundleListener beginStartupEvent;
+    private IBundleListener beginRunEvent;
+    private boolean isInstallSpxFile = false;
 
-    private ILogger rtLogger;
-
-    private BootAttribute attr;
-
-    /**
-     * 当前bundle的目录,肯定以File.separator结尾
-     */
     private String workPath;
-
     private String binFolder;
     private String classesFolder;
     private String libFolder;
     private String confFolder;
     private String appsFolder;
 
-    private BundleContext(String sessionId, String bundleName, String workPath, ClassLoader loader, String launcher) {
-        this.bundleName = bundleName;
-        if(null == loader) {
-            BundleClassLoader classLoader = BundleClassLoader.newInstance(bundleName);
+    public BundleContext setBundleName(String name){
+        this.bundleName = name;
+        return this;
+    }
+
+    public BundleContext setClassLoader(ClassLoader loader){
+        this.classLoader = loader;
+        return this;
+    }
+
+    public BundleContext setStartupTypeName(String  typeName){
+        this.startupType = typeName;
+        return this;
+    }
+
+    public BundleContext setWorkFolder(String workFolder){
+        this.workPath = workFolder;
+        return this;
+    }
+
+    public BundleContext setLogger(ILogger runtimeLogger){
+        this.runtimeLogger = runtimeLogger;
+        return this;
+    }
+
+    public BundleContext setBeginStartupEvent(IBundleListener beginStartupEvent){
+        this.beginStartupEvent = beginStartupEvent;
+        return this;
+    }
+
+    public BundleContext setBeginRunEvent(IBundleListener beginRunEvent){
+        this.beginRunEvent = beginRunEvent;
+        return this;
+    }
+
+    /**
+     * 是否加载spx文件，对于v1.*的albianj，请设置该选项
+     * @param enable
+     * @return
+     */
+    public BundleContext setInstallSpxFile(boolean enable){
+        this.isInstallSpxFile = enable;
+        return this;
+    }
+
+    public BundleContext build(String sessionId){
+        if(null == this.classLoader) {
+            BundleClassLoader classLoader = isInstallSpxFile
+                    ?  AlbianClassLoader.newInstance(bundleName)
+                    : BundleClassLoader.newInstance(bundleName);
+
             this.classLoader = classLoader;
         }
         if (workPath.endsWith(File.separator)) {
@@ -62,7 +94,6 @@ public class BundleContext {
         }
         threadGroup = new ThreadGroup(bundleName);
         threadGroup.setDaemon(true);
-        this.launcher = launcher;
         this.binFolder = this.workPath + "bin" + File.separator;
         this.libFolder = this.workPath + "lib" + File.separator;
         this.classesFolder = this.workPath + "classes" + File.separator;
@@ -74,10 +105,15 @@ public class BundleContext {
                 "Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
                 this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder);
 
+        return this;
     }
 
-    public static BundleContext newInstance(String sessionid, String bundleName, String workPath, ClassLoader loader, String launcher) {
-        return new BundleContext(sessionid,bundleName, workPath, loader,launcher);
+    protected BundleContext() {
+
+    }
+
+    public static BundleContext newInstance() {
+        return new BundleContext();
     }
 
     public ClassLoader getClassLoader() {
@@ -112,6 +148,10 @@ public class BundleContext {
         return this.bundleName;
     }
 
+    public String getStartupType(){
+        return this.startupType;
+    }
+
     public ThreadGroup getThreadGroup(){
         return this.threadGroup;
     }
@@ -120,46 +160,50 @@ public class BundleContext {
         return new BundleThread(this,name,func);
     }
 
-    public ILogger getRuntimeLogger() {
-        return rtLogger;
-    }
-
-    public void setRuntimeLogger(ILogger rtLogger) {
-        this.rtLogger = rtLogger;
+    public ILogger findLogger() {
+        return runtimeLogger;
     }
 
     public String findConfigFile(String simpleFileName){
         return this.confFolder + simpleFileName;
     }
 
-    public String getLauncherClass() {
-        return launcher;
-    }
-
-    public void launchBundle(final String[] args){
+    public void startup(final String[] args){
+        if(null != this.beginStartupEvent) {
+            this.beginRunEvent.onActionExecute(this);
+        }
         BundleThread thread = null;
         try {
             thread = newThread(this.bundleName, new Runnable() {
                 @Override
                 public void run() {
-                    BundleContext ctx = AlbianApplicationServant.Instance.findBundleContext(bundleName, true);
-                    String clzzName = ctx.getLauncherClass();
+                    BundleContext ctx = ApplicationContext.Instance.findBundleContext(bundleName, true);
+                    String startupTypeName = ctx.getStartupType();
                     try {
-                        Class<?> clzz = ctx.getClassLoader().loadClass(clzzName);
+                        Class<?> clzz = ctx.getClassLoader().loadClass(startupTypeName);
                         Object launcher =  clzz.newInstance();
                         Method startup = null;
                         startup = clzz.getMethod("startup",String[].class);
+                        if(null == startup){
+                            LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
+                                    this.getClass(),null,"Bundle launcher Error.",null,
+                                    "Bundle -> {0} startup by Class -> {1},but it without method startup(string[] args).Make sure the method is exist",
+                                    bundleName, startupTypeName);
+                        }
+                        if(null != beginRunEvent) {
+                            beginRunEvent.onActionExecute(ctx);
+                        }
                         startup.invoke(launcher,args);
-                        LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
+                        LogServant.Instance.addRuntimeLog("LaunchThread", LoggerLevel.Info,
                                 this.getClass(),null,"Bundle launcher.",null,
                                 "Startup bundle -> {0} with class -> {1} success.",
-                                bundleName, clzzName);
+                                bundleName, startupTypeName);
 
                     } catch (Exception e) {
                         LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
                                 this.getClass(),e,"Bundle launcher error.",null,
                                 "Startup bundle -> {0} with class -> {1} is error.",
-                                bundleName, clzzName);
+                                bundleName, startupTypeName);
                     }
                 }
             });
@@ -178,11 +222,4 @@ public class BundleContext {
         }
     }
 
-    public BootAttribute getAttr() {
-        return attr;
-    }
-
-    public void setAttr(BootAttribute attr) {
-        this.attr = attr;
-    }
 }

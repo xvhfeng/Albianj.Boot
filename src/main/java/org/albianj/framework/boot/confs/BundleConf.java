@@ -1,23 +1,16 @@
-package org.albianj.framework.boot.entry;
+package org.albianj.framework.boot.confs;
 
-
-import org.albianj.framework.boot.IAlbianBundleLauncher;
-
-public class BundleAttribute {
+public class BundleConf {
     private String name;
     private String workFolder;
     private String startupClassname;
+    private boolean isInstallSpxFile = false;
 
-    public BundleAttribute(String name, String workFolder, String startupClassname) {
+    public BundleConf(String name, String workFolder, String startupClassname,boolean isInstallSpxFile) {
         this.name = name;
         this.workFolder = workFolder;
         this.startupClassname = startupClassname;
-    }
-
-    public BundleAttribute(String name, String workFolder, Class<? extends IAlbianBundleLauncher> launcherClzz) {
-        this.name = name;
-        this.workFolder = workFolder;
-        this.startupClassname = launcherClzz.getName();
+        this.isInstallSpxFile = isInstallSpxFile;
     }
 
     public String getName() {
@@ -44,4 +37,11 @@ public class BundleAttribute {
         this.startupClassname = startupClassname;
     }
 
+    public boolean isInstallSpxFile() {
+        return isInstallSpxFile;
+    }
+
+    public void setInstallSpxFile(boolean installSpxFile) {
+        isInstallSpxFile = installSpxFile;
+    }
 }

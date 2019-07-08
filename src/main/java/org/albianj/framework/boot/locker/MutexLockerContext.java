@@ -1,9 +1,8 @@
 package org.albianj.framework.boot.locker;
 
 
-import org.albianj.framework.boot.AlbianApplicationServant;
 import org.albianj.framework.boot.BundleThread;
-import org.albianj.framework.boot.helpers.StringServant;
+import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,7 +30,7 @@ public class MutexLockerContext {
                         ((BundleThread) t).getCurrentBundleContext().getBundleName(),t.getName());
             } else {
                 owner = StringServant.Instance.format("{0}-{1}",
-                        AlbianApplicationServant.Instance.BootBundleName,t.getName());
+                        "AppContext",t.getName());
             }
             this.clzz = clzz;
             this. ts = System.currentTimeMillis();

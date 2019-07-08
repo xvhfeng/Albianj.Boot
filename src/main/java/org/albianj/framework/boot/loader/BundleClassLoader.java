@@ -1,8 +1,8 @@
 package org.albianj.framework.boot.loader;
 
 import org.albianj.framework.boot.BundleContext;
-import org.albianj.framework.boot.helpers.FileServant;
-import org.albianj.framework.boot.helpers.TypeServant;
+import org.albianj.framework.boot.servants.FileServant;
+import org.albianj.framework.boot.servants.TypeServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.io.File;
@@ -40,15 +40,19 @@ public class BundleClassLoader extends ClassLoader {
      * key - full classname
      * value - class file metadata
      */
-    private Map<String, TypeFileMetadata> clzzFileMetadatasInBin = null;
-    private Map<String, TypeFileMetadata> clzzFileMetadatasInCls = null;
-    private Map<String, TypeFileMetadata> clzzFileMetadatasInLib = null;
+//    private Map<String, TypeFileMetadata> clzzFileMetadatasInBin = null;
+//    private Map<String, TypeFileMetadata> clzzFileMetadatasInCls = null;
+//    private Map<String, TypeFileMetadata> clzzFileMetadatasInLib = null;
 
-    private BundleClassLoader(String bundleName) {
+    protected Map<String,TypeFileMetadata> totalFileMetadatas = null;
+
+    protected BundleClassLoader(String bundleName) {
         this.bundleName = bundleName;
-        clzzFileMetadatasInBin = new HashMap<>();
-        clzzFileMetadatasInCls = new HashMap<>();
-        clzzFileMetadatasInLib = new HashMap<>();
+//        clzzFileMetadatasInBin = new HashMap<>();
+//        clzzFileMetadatasInCls = new HashMap<>();
+//        clzzFileMetadatasInLib = new HashMap<>();
+
+        totalFileMetadatas = new HashMap<>();
     }
 
     public static BundleClassLoader newInstance(String bundleName) {
@@ -93,16 +97,16 @@ public class BundleClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        // step 1 : find from bin directory
-        TypeFileMetadata cfm = clzzFileMetadatasInBin.get(name);
-        // step 2 : if not find from bin directory then find from classes directory
-        if (cfm == null) {
-            cfm = clzzFileMetadatasInCls.get(name);
-        }
-        // step 3 : if not find from classes directory then find from lib directory
-        if (cfm == null) {
-            cfm = clzzFileMetadatasInLib.get(name);
-        }
+//         step 1 : find from bin directory
+        TypeFileMetadata cfm = totalFileMetadatas.get(name);
+//        // step 2 : if not find from bin directory then find from classes directory
+//        if (cfm == null) {
+//            cfm = clzzFileMetadatasInCls.get(name);
+//        }
+//        // step 3 : if not find from classes directory then find from lib directory
+//        if (cfm == null) {
+//            cfm = clzzFileMetadatasInLib.get(name);
+//        }
 
         if (cfm != null) {
             byte[] bytes = cfm.getFileContentBytes();
@@ -142,7 +146,7 @@ public class BundleClassLoader extends ClassLoader {
         return super.findClass(name);
     }
 
-    public void scanClassesFile(String rootFinder, String currFinder, Map<String, TypeFileMetadata> map) {
+    public void scanClassesFile(String fromFolder,String rootFinder, String currFinder, Map<String, TypeFileMetadata> map) {
         File finder = new File(rootFinder);
         if (!finder.exists()) {
 
@@ -156,7 +160,7 @@ public class BundleClassLoader extends ClassLoader {
         });
         for (File f : files) {
             if (f.isDirectory()) {
-                scanClassesFile(rootFinder, f.getAbsolutePath(), map);
+                scanClassesFile(fromFolder,rootFinder, f.getAbsolutePath(), map);
             }
             if (f.isFile()) {
                 try {
@@ -166,7 +170,7 @@ public class BundleClassLoader extends ClassLoader {
                     }
                     byte[] bytes = FileServant.Instance.getFileBytes(relFileName);
                     Class<?> cla = defineClass(f.getAbsolutePath(), bytes, 0, bytes.length);
-                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false);
+                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
                     cfm.setType(cla);
                 } catch (Exception e) {
 
@@ -175,7 +179,7 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    public void scanJarFolder(String jarFinder, Map<String, TypeFileMetadata> map) {
+    public void scanJarFolder(String fromFolder,String jarFinder, Map<String, TypeFileMetadata> map) {
         File finder = new File(jarFinder);
         if (!finder.exists()) {
 
@@ -189,11 +193,11 @@ public class BundleClassLoader extends ClassLoader {
         });
         for (File f : files) {
             if (f.isDirectory()) {
-                scanJarFolder(jarFinder, map);
+                scanJarFolder(fromFolder,jarFinder, map);
             }
             if (f.isFile()) {
                 try {
-                    scanJarFile(f.getAbsolutePath(), map);
+                    scanJarFile(fromFolder,f.getAbsolutePath(), map);
                 } catch (Exception e) {
 
                 }
@@ -201,24 +205,11 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    public void scanJarFile(String jarFile, Map<String, TypeFileMetadata> map) {
+    public void scanJarFile(String fromFolder,String jarFile, Map<String, TypeFileMetadata> map) {
         JarInputStream jis = null;
         try {
             jis = new JarInputStream(new FileInputStream(jarFile));
-            JarEntry entry = null;
-            while (null != (entry = jis.getNextJarEntry())) {
-                String name = entry.getName();
-                if (name.endsWith(".class")) {
-                    if (map.containsKey(name)) {
-                        continue;
-                    }
-                    byte[] bytes = TypeServant.Instance.readJarBytes(jis);
-                    Class<?> cla = defineClass(name, bytes, 0, bytes.length);
-                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true);
-                    cfm.setType(cla);
-                    map.put(cfm.getFullClassName(), cfm);
-                }
-            }
+            sacnSingleJarBytes(fromFolder, jarFile, map, jis);
         } catch (Exception e) {
 
         } finally {
@@ -227,6 +218,23 @@ public class BundleClassLoader extends ClassLoader {
                     jis.close();
                 } catch (IOException e) {
                 }
+            }
+        }
+    }
+
+    protected void sacnSingleJarBytes(String fromFolder, String jarFile, Map<String, TypeFileMetadata> map, JarInputStream jis) throws IOException {
+        JarEntry entry = null;
+        while (null != (entry = jis.getNextJarEntry())) {
+            String name = entry.getName();
+            if (name.endsWith(".class")) {
+                if (map.containsKey(name)) {
+                    continue;
+                }
+                byte[] bytes = TypeServant.Instance.readJarBytes(jis);
+                Class<?> cla = defineClass(name, bytes, 0, bytes.length);
+                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true,fromFolder);
+                cfm.setType(cla);
+                map.put(cfm.getFullClassName(), cfm);
             }
         }
     }
@@ -249,10 +257,14 @@ public class BundleClassLoader extends ClassLoader {
      * @param classesFolder
      * @param libFolder
      */
-    public void loadAllClass(String binFolder, String classesFolder, String libFolder) {
-        scanJarFolder(binFolder, clzzFileMetadatasInBin);
-        scanClassesFile(classesFolder, classesFolder, clzzFileMetadatasInCls);
-        scanJarFolder(libFolder, clzzFileMetadatasInLib);
+    private void loadAllClass(String binFolder, String classesFolder, String libFolder) {
+        /**
+         * because load priority,so  low priority loading before high priority
+         */
+        scanJarFolder("lib",libFolder, totalFileMetadatas);
+        scanClassesFile("classes",classesFolder, classesFolder, totalFileMetadatas);
+        scanJarFolder("bin",binFolder, totalFileMetadatas);
+
     }
 
     /**
@@ -264,6 +276,20 @@ public class BundleClassLoader extends ClassLoader {
     }
 
     /**
+     * 按照主从合并类元素，
+     * @param map
+     * @param isReplaceIfExist，当为true，参数map为master，其将替换原total中的类（如果有的话)
+     */
+    protected void mergerTypeFileMetadata(Map<String,TypeFileMetadata> map,boolean isReplaceIfExist){
+        if(isReplaceIfExist) {
+            this.totalFileMetadatas.putAll(map);
+        } else {
+            map.putAll(this.totalFileMetadatas);
+            this.totalFileMetadatas = map;
+        }
+    }
+
+    /**
      * 根据指定的Anno来获取所有的class，不包括抽象类与接口
      * @param markAnno 被标记的Tag
      * @param unmarkAnno 未被标记的Tag
@@ -271,9 +297,7 @@ public class BundleClassLoader extends ClassLoader {
      */
     public Map<String,TypeFileMetadata> findNormalTypeWithAnno(Class<? extends Annotation> markAnno,Class<? extends Annotation> unmarkAnno){
         Map<String,TypeFileMetadata> map = new HashMap<>();
-        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,clzzFileMetadatasInBin,map);
-        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,clzzFileMetadatasInCls,map);
-        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,clzzFileMetadatasInLib,map);
+        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,totalFileMetadatas,map);
         return map;
     }
 
@@ -284,9 +308,7 @@ public class BundleClassLoader extends ClassLoader {
      */
     public Map<String,TypeFileMetadata> findNormalTypeWithParent(Class<?> parent){
         Map<String,TypeFileMetadata> map = new HashMap<>();
-        findNormalTypeWithParentAndAnno(parent,null,null,clzzFileMetadatasInBin,map);
-        findNormalTypeWithParentAndAnno(parent,null,null,clzzFileMetadatasInCls,map);
-        findNormalTypeWithParentAndAnno(parent,null,null,clzzFileMetadatasInLib,map);
+        findNormalTypeWithParentAndAnno(parent,null,null,totalFileMetadatas,map);
         return map;
     }
 

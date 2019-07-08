@@ -1,11 +1,11 @@
 package org.albianj.framework.boot.logging;
 
-import org.albianj.framework.boot.AlbianApplicationServant;
+import org.albianj.framework.boot.ApplicationContext;
 import org.albianj.framework.boot.BundleContext;
 import org.albianj.framework.boot.except.DisplayException;
 import org.albianj.framework.boot.except.HiddenException;
 import org.albianj.framework.boot.except.ThrowableServant;
-import org.albianj.framework.boot.helpers.StringServant;
+import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.logging.impl.Logger;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
@@ -25,6 +25,9 @@ import org.albianj.framework.boot.tags.BundleSharingTag;
 @BundleSharingTag
 public class LogServant {
 
+    public final static String RuntimeLogNameDef = "Runtime";
+    public final static String RuntimeLogLevelDef="DEBUG";
+
     public static LogServant Instance = null;
 
     static {
@@ -39,19 +42,26 @@ public class LogServant {
 
     public void newRuntimeLogger(String logName,String logsFolder,String level,boolean isOpenConsole){
         ILogger logger =  new Logger(logName,logsFolder,level,isOpenConsole);
-        BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
-        bundleContext.setRuntimeLogger(logger);
+        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
+        if(null == bundleContext) {
+            ApplicationContext.Instance.setLogger(logger);
+        } else {
+            bundleContext.setLogger(logger);
+        }
     }
 
-    public void newRuntimeLogger(ILoggerAttribute logAttr){
-        ILogger logger =  new Logger(logAttr.getLoggerName(),logAttr.getPath(),logAttr.getLevel(),logAttr.isOpenConsole());
-        BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
-        bundleContext.setRuntimeLogger(logger);
+    public void newRuntimeLogger(ILoggerConf logAttr){
+        this.newRuntimeLogger(logAttr.getLoggerName(),logAttr.getPath(),logAttr.getLevel(),logAttr.isOpenConsole());
     }
 
     public void updateRuntimeLogger(String level,boolean isOpenConsole,String maxFilesize){
-        BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
-        ILogger logger = bundleContext.getRuntimeLogger();
+        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
+        ILogger logger = null;
+        if(null == bundleContext) {
+            logger = ApplicationContext.Instance.findLogger();
+        } else {
+            logger = bundleContext.findLogger();
+        }
         if(isOpenConsole && !logger.isConsoleAppenderOpened()){
             logger.openConsoleAppender();
         } else {
@@ -80,17 +90,15 @@ public class LogServant {
      * @param objs 供日志格式化字段使用的参数
      */
     public void addRuntimeLog(String sessionId, LoggerLevel level, Class<?> refType, Throwable e, String brief, String secretMsg, String fmt, Object... objs) {
-       BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
+       BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
         String msg = StringServant.Instance.format(fmt,objs);
         ILogger logger = null;
         if(null == bundleContext){
-            BundleContext bootBundleCtx = AlbianApplicationServant.Instance.getBootBundleContext();
-            logger = bootBundleCtx.getRuntimeLogger();
+            logger = ApplicationContext.Instance.findLogger();
         } else {
-            logger = bundleContext.getRuntimeLogger();
+            logger = bundleContext.findLogger();
             if (null == logger) {
-                BundleContext bootBundleCtx = AlbianApplicationServant.Instance.getBootBundleContext();
-                logger = bootBundleCtx.getRuntimeLogger();
+                logger = ApplicationContext.Instance.findLogger();
             }
         }
        logger.log(sessionId, bundleContext.getBundleName(), level,  refType, e,brief,secretMsg, msg);
@@ -128,29 +136,4 @@ public class LogServant {
         }
         ThrowableServant.Instance.throwDisplayException(refType,e, brief, msg);
     }
-
-//    public void addMonitorLog(String sessionId, LoggerLevel level, Class<?> calledClzz, Throwable e,String brief, String fmt, Object... objs) {
-//        BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
-//        String showMsg = StringServant.Instance.format(fmt,objs);
-//        bundleContext.getMonitorLogger().log(sessionId,bundleContext.getBundleName(),level,calledClzz,e,brief,null,showMsg);
-//        return;
-//    }
-//
-//    public void addActiveLog(String sessionId, LoggerLevel level, Class<?> calledClzz, Throwable e,String brief, String fmt, Object... objs) {
-//        BundleContext bundleContext = AlbianApplicationServant.Instance.getCurrentBundleContext();
-//        String showMsg = StringServant.Instance.format(fmt,objs);
-//        bundleContext.getActiveLogger().log(sessionId,bundleContext.getBundleName(),level,calledClzz,e,brief,null,showMsg);
-//        return;
-//    }
-//
-
-
-//    public void addRuntimeLogAndThrow(String sessionId, LoggerLevel level,  Class<?> calledClzz, Throwable e,String breif,String secretMsg, String fmt, Object... objs){
-//        addRuntimeLog(sessionId,level,calledClzz,e,breif,fmt,objs);
-//        if(e instanceof HiddenException){
-//            throw (HiddenException) e;
-//        }
-//        String showMsg = StringServant.Instance.format(fmt,objs);
-//        throw new HiddenException(ThrowableServant.Instance.logLevel2Code(level),e,secretMsg, breif, showMsg);
-//    }
 }

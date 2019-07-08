@@ -1,9 +1,9 @@
 package org.albianj.framework.boot.timer.impl;
 
 
-import org.albianj.framework.boot.AlbianApplicationServant;
+import org.albianj.framework.boot.ApplicationContext;
 import org.albianj.framework.boot.BundleContext;
-import org.albianj.framework.boot.helpers.TypeServant;
+import org.albianj.framework.boot.servants.TypeServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.albianj.framework.boot.timer.ITimeoutEntry;
 import org.albianj.framework.boot.timer.ITimer;
@@ -45,15 +45,15 @@ public class TimerWheel implements ITimer {
     private volatile long startTime;
 
     public TimerWheel() {
-        this(AlbianApplicationServant.Instance.getCurrentBundleContext());
+        this(ApplicationContext.Instance.findCurrentBundleContext(TimerWheel.class,true));
     }
 
     public TimerWheel(long loopTimestamp, TimeUnit unit) {
-        this(AlbianApplicationServant.Instance.getCurrentBundleContext(), loopTimestamp, unit);
+        this(ApplicationContext.Instance.findCurrentBundleContext(TimerWheel.class,true), loopTimestamp, unit);
     }
 
     public TimerWheel(long loopTimestamp, TimeUnit unit, int wheelCount) {
-        this(AlbianApplicationServant.Instance.getCurrentBundleContext(), loopTimestamp, unit, wheelCount);
+        this(ApplicationContext.Instance.findCurrentBundleContext(TimerWheel.class,true), loopTimestamp, unit, wheelCount);
     }
 
 
@@ -332,7 +332,7 @@ public class TimerWheel implements ITimer {
                 //
                 // See https://github.com/netty/netty/issues/356
 //                if (PlatformDependent.isWindows()) {
-                    if (AlbianApplicationServant.Instance.isWindows()) {
+                    if (ApplicationContext.Instance.isWindows()) {
                     sleepTimeMs = sleepTimeMs / 10 * 10;
                 }
 
@@ -556,7 +556,7 @@ public class TimerWheel implements ITimer {
             }
 
             if (timeout == head) {
-                // if timeout is also the tail we need to adjust the entry too
+                // if timeout is also the tail we need to adjust the confs too
                 if (timeout == tail) {
                     tail = null;
                     head = null;

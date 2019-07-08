@@ -1,11 +1,11 @@
-package org.albianj.framework.boot.entry;
+package org.albianj.framework.boot.confs;
 
 
-import org.albianj.framework.boot.logging.ILoggerAttribute;
+import org.albianj.framework.boot.logging.ILoggerConf;
 
 import java.util.Map;
 
-public class BootAttribute {
+public class AppConf {
     private String appName = "AlbianDefaultApp";
     private String machineId;
     private String machineKey = "wefet45y56gd&^%&$($$fbf943sf98^&*&*%$@%$34tksdjfvh823r2=sdfssdfsdp[sfshfwwefwffwe";
@@ -14,11 +14,11 @@ public class BootAttribute {
     /**
      * 根logger的配置信息
      */
-    private ILoggerAttribute rootLoggerAttr;
+    private ILoggerConf rootLoggerAttr;
 
-    private Map<String, ILoggerAttribute> loggerAttrs;
+    private Map<String, ILoggerConf> loggerAttrs;
 
-    private Map<String, BundleAttribute> bundles;
+    private Map<String, BundleConf> bundles;
 
     public String getAppName() {
         return appName;
@@ -52,27 +52,27 @@ public class BootAttribute {
         this.runtimeLevel = runtimeLevel;
     }
 
-    public Map<String, ILoggerAttribute> getLoggerAttrs() {
+    public Map<String, ILoggerConf> getLoggerAttrs() {
         return loggerAttrs;
     }
 
-    public void setLoggerAttrs(Map<String, ILoggerAttribute> loggerAttrs) {
+    public void setLoggerAttrs(Map<String, ILoggerConf> loggerAttrs) {
         this.loggerAttrs = loggerAttrs;
     }
 
-    public ILoggerAttribute getRootLoggerAttr() {
+    public ILoggerConf getRootLoggerAttr() {
         return rootLoggerAttr;
     }
 
-    public void setRootLoggerAttr(ILoggerAttribute rootLoggerAttr) {
+    public void setRootLoggerAttr(ILoggerConf rootLoggerAttr) {
         this.rootLoggerAttr = rootLoggerAttr;
     }
 
-    public Map<String, BundleAttribute> getBundleAttrs() {
+    public Map<String, BundleConf> getBundlesConf() {
         return bundles;
     }
 
-    public void setBundleAttrs(Map<String, BundleAttribute> bundles) {
+    public void setBundlesConf(Map<String, BundleConf> bundles) {
         this.bundles = bundles;
     }
 }

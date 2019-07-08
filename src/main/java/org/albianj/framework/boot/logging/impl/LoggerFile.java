@@ -1,8 +1,8 @@
 package org.albianj.framework.boot.logging.impl;
 
-import org.albianj.framework.boot.helpers.DailyServant;
-import org.albianj.framework.boot.helpers.OptConvertServant;
-import org.albianj.framework.boot.helpers.StringServant;
+import org.albianj.framework.boot.servants.DailyServant;
+import org.albianj.framework.boot.servants.ConvertServant;
+import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.locker.MutexLockerContext;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.albianj.framework.boot.timer.ITimeoutEntry;
@@ -32,7 +32,7 @@ public class LoggerFile implements Closeable {
         if (!path.endsWith(File.separator)) {
             path = path + File.separator;
         }
-        this.maxFilesizeB = OptConvertServant.Instance.toFileSize(maxFilesize, 10 * 1024 * 1024);
+        this.maxFilesizeB = ConvertServant.Instance.toFileSize(maxFilesize, 10 * 1024 * 1024);
         this.free = this.maxFilesizeB;
         buf = ByteBuffer.allocateDirect((int) this.maxFilesizeB);
 
@@ -107,11 +107,11 @@ public class LoggerFile implements Closeable {
 
     public void close() {
         /**
-         * first delete the timeout entry to giveup flush
+         * first delete the timeout confs to giveup flush
          */
         TimerServant.Instance.cancelEntry(entry);
         /**
-         * must with mutex,if maybe in the timeout entry flushing
+         * must with mutex,if maybe in the timeout confs flushing
          */
         flushWithMutex();
         try {

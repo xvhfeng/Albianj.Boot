@@ -1,11 +1,11 @@
 package org.albianj.framework.boot.logging.impl;
 
 
-import org.albianj.framework.boot.logging.ILoggerAttribute;
+import org.albianj.framework.boot.logging.ILoggerConf;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 @BundleSharingTag
-public class LoggerAttribute implements ILoggerAttribute {
+public class LoggerConf implements ILoggerConf {
 
     private String loggerName = null;
     private String path = null;
@@ -13,7 +13,7 @@ public class LoggerAttribute implements ILoggerAttribute {
     private boolean openConsole = false;
     private String maxFilesize = "10MB";
 
-    public LoggerAttribute(String loggerName, String path, String level, boolean isOpenConsole, String maxFilesize){
+    public LoggerConf(String loggerName, String path, String level, boolean isOpenConsole, String maxFilesize){
         this.loggerName = loggerName;
         this.path = path;
         this.level = level;
