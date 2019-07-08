@@ -6,8 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Albianj.Boot" />
+        <module name="Albianj.Launcher" />
+        <module name="Albianj.Launcher.Test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Albianj.Launcher.Test" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>
