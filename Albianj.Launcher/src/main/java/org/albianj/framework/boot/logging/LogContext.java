@@ -10,9 +10,9 @@ public class LogContext {
     private char cqName = 'A';
     private LoggerLevel level = LoggerLevel.All;
     private volatile boolean isStopAccept = false;
-    private ILoggerConf logConf;
+    private LoggerConf logConf;
 
-    public LogContext(ILoggerConf logConf){
+    public LogContext(LoggerConf logConf){
         this.logConf = logConf;
         this.level = LoggerLevel.toLevel(logConf.getLevel());
     }
@@ -40,31 +40,39 @@ public class LogContext {
                 cq = aq;
                 cqName = 'A';
             }
-        }
 
-        if(q.isEmpty()) {
-            return;
-        }
 
-        StringBuffer sb = new StringBuffer();
-        for(LogPacket p : q){
-            sb.append(p.toString());
-        }
+            if (q.isEmpty()) {
+                return;
+            }
 
-        if(null == lfi){
-            lfi = new LogFileItem(logConf.getLoggerName(),logConf.getPath(),logConf.getMaxFilesize());
-        }
-        lfi.write(sb.toString());
+            StringBuffer sb = new StringBuffer();
+            for (LogPacket p : q) {
+                sb.append(p.toString());
+            }
 
-        if(logConf.isOpenConsole()){
-            System.out.print(sb);
+            if (null == lfi) {
+                lfi = new LogFileItem(logConf.getLoggerName(), logConf.getPath(), logConf.getMaxFilesize());
+            }
+            lfi.write(sb.toString());
+
+            if (logConf.isOpenConsole()) {
+                System.out.print(sb);
+            }
         }
         return;
     }
 
     public void close(){
-        isStopAccept = true;
         flush(true);
+    }
+
+    public void repaire(LoggerConf logConf) {
+        this.logConf = logConf;
+        this.level = LoggerLevel.toLevel(logConf.getLevel());
+        if(null != lfi){
+            lfi.repair(logConf.getPath(),logConf.getMaxFilesize());
+        }
     }
 
 

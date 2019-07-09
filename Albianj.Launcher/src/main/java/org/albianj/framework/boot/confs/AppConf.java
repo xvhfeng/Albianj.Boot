@@ -1,7 +1,7 @@
 package org.albianj.framework.boot.confs;
 
 
-import org.albianj.framework.boot.logging.ILoggerConf;
+import org.albianj.framework.boot.logging.LoggerConf;
 
 import java.util.Map;
 
@@ -14,9 +14,9 @@ public class AppConf {
     /**
      * 根logger的配置信息
      */
-    private ILoggerConf rootLoggerAttr;
+    private LoggerConf rootLoggerAttr;
 
-    private Map<String, ILoggerConf> loggerAttrs;
+    private Map<String, LoggerConf> loggerAttrs;
 
     private Map<String, BundleConf> bundles;
 
@@ -52,19 +52,19 @@ public class AppConf {
         this.runtimeLevel = runtimeLevel;
     }
 
-    public Map<String, ILoggerConf> getLoggerAttrs() {
+    public Map<String, LoggerConf> getLoggerAttrs() {
         return loggerAttrs;
     }
 
-    public void setLoggerAttrs(Map<String, ILoggerConf> loggerAttrs) {
+    public void setLoggerAttrs(Map<String, LoggerConf> loggerAttrs) {
         this.loggerAttrs = loggerAttrs;
     }
 
-    public ILoggerConf getRootLoggerAttr() {
+    public LoggerConf getRootLoggerAttr() {
         return rootLoggerAttr;
     }
 
-    public void setRootLoggerAttr(ILoggerConf rootLoggerAttr) {
+    public void setRootLoggerAttr(LoggerConf rootLoggerAttr) {
         this.rootLoggerAttr = rootLoggerAttr;
     }
 

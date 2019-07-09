@@ -84,27 +84,39 @@ public class AlbianClassLoader extends BundleClassLoader {
         }
 
         if (null == files) { // check isNull for find in lib folder
-            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                    this.getClass(), null,
-                    "Found SpxLib Fail", null,
-                    "Not Found albian.spx file in bin or lib folder at work folder {0},but the file must exist.please check it.",
-                    bctx.getWorkFolder());
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LoadSpxLib")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("Found SpxLib Fail")
+                    .addMessage("Not Found albian.spx file in bin or lib folder at work folder {0},but the file must exist.please check it.",
+                            bctx.getWorkFolder())
+                    .toLogger();
         }
 
         if (2 >= files.size()) { // check isNull for find in lib folder
-                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                        this.getClass(), null,
-                        "Found SpxLib Fail", null,
-                        "Found {0} albian.spx file in bin or lib folder at work folder {1}.The file must be single.",
-                        files.size(), bctx.getWorkFolder());
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LoadSpxLib")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("Found SpxLib Fail")
+                    .addMessage("Found {0} albian.spx file in bin or lib folder at work folder {1}.The file must be single.",
+                            files.size(), bctx.getWorkFolder())
+                    .toLogger();
         }
 
         File spxFile = files.get(0);
 
-        LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Mark,
-                this.getClass(), null,
-                "Load SpxFile", null,
-                "Load Albian spxFile -> {0}.", spxFile.getName());
+        LogServant.Instance.newLogPacket()
+                .forSessionId("LoadSpxLib")
+                .atLevel(LoggerLevel.Mark)
+                .byCalled(this.getClass())
+                .takeBrief("Load SpxFile")
+                .addMessage("Load Albian spxFile -> {0}.", spxFile.getName())
+                .toLogger();
+
         return spxFile;
     }
 
@@ -120,31 +132,43 @@ public class AlbianClassLoader extends BundleClassLoader {
             fis.read(bVersion);
             String sFVersion = bVersion.toString();
             if (!sFVersion.equalsIgnoreCase(sVersion)) {
-                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                        this.getClass(), null,
-                        "SpxLib Version Fail", null,
-                        "albian.spx version is not same.file version -> {0} and packing version -> {1}.",
-                        sVersion,bVersion);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId("LoadSpxLib")
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("SpxLib Version Fail")
+                        .addMessage("albian.spx version is not same.file version -> {0} and packing version -> {1}.",
+                                sVersion,bVersion)
+                        .toLogger();
                 return false;
             }
             return true;
         } catch (IOException e) {
-            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                    this.getClass(), e,
-                    "SpxLib Version Fail", null,
-                    "Open and read Albian.spx -> {0} is fail.",
-                    fname);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LoadSpxLib")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .withCause(e)
+                    .takeBrief("SpxLib Version Fail")
+                    .addMessage("Open and read Albian.spx -> {0} is fail.",
+                            fname)
+                    .toLogger();
             return false;
         } finally {
             if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
-                            this.getClass(), e,
-                            "SpxLib Version Fail", null,
-                            "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
-                            fname);
+                    LogServant.Instance.newLogPacket()
+                            .forSessionId("LoadSpxLib")
+                            .atLevel(LoggerLevel.Warn)
+                            .byCalled(this.getClass())
+                            .takeBrief("SpxLib Version Fail")
+                            .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                                    fname)
+                            .toLogger();
                 }
             }
         }
@@ -159,32 +183,45 @@ public class AlbianClassLoader extends BundleClassLoader {
 
             ArrayList<byte[]> list = parserSpxFileToBytes(fis);
             if (CollectServant.Instance.isNullOrEmpty(list)) {
-                LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                        this.getClass(), null,
-                        "Parser SpxLib Error", null,
-                        "Parser Albian.spx -> {0} to bytes array is null or empty,maybe spx-file format is error or not accord with Albian.Loading .",
-                        fname);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId("LoadSpxLib")
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("Parser SpxLib Error")
+                        .addMessage("Parser Albian.spx -> {0} to bytes array is null or empty,maybe spx-file format is error or not accord with Albian.Loading .",
+                                fname)
+                        .toLogger();
             }
             for (byte[] bs : list) {
                 scanSingleJarInSpxLib(fname, "", bs, map);
             }
 
         } catch (IOException e) {
-            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                    this.getClass(), e,
-                    "Parser SpxLib Error", null,
-                    "Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
-                    fname);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LoadSpxLib")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .withCause(e)
+                    .takeBrief("Parser SpxLib Error")
+                    .addMessage("Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
+                            fname)
+                    .toLogger();
         } finally {
             if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
-                            this.getClass(), e,
-                            "Parser SpxLib Fail", null,
-                            "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
-                            fname);
+                    LogServant.Instance.newLogPacket()
+                            .forSessionId("LoadSpxLib")
+                            .atLevel(LoggerLevel.Warn)
+                            .byCalled(this.getClass())
+                            .withCause(e)
+                            .takeBrief("Parser SpxLib Fail")
+                            .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                                    fname)
+                            .toLogger();
                 }
             }
         }
@@ -214,20 +251,29 @@ public class AlbianClassLoader extends BundleClassLoader {
             jis = new JarInputStream(new ByteArrayInputStream(b));
             sacnSingleJarBytes(spxFilename, jarFilename, map, jis);
         } catch (IOException e) {
-            LogServant.Instance.addRuntimeLogAndThrow("LoadSpxLib", LoggerLevel.Error,
-                    this.getClass(), e,
-                    "Parser SpxLib Error", null,
-                    "Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
-                    spxFilename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LoadSpxLib")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .withCause(e)
+                    .alwaysThrow(true)
+                    .takeBrief("Parser SpxLib Fail")
+                    .addMessage("Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
+                                spxFilename)
+                    .toLogger();
         } finally {
             try {
                 jis.close();
             } catch (IOException e) {
-                LogServant.Instance.addRuntimeLog("LoadSpxLib", LoggerLevel.Warn,
-                        this.getClass(), e,
-                        "Parser SpxLib Fail", null,
-                        "Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
-                        spxFilename);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId("LoadSpxLib")
+                        .atLevel(LoggerLevel.Warn)
+                        .byCalled(this.getClass())
+                        .withCause(e)
+                        .takeBrief("Parser SpxLib Fail")
+                        .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
+                                spxFilename)
+                        .toLogger();
             }
         }
     }

@@ -23,49 +23,48 @@ public class LogFileItem {
         this.maxFilesizeB = ConvertServant.Instance.toFileSize(maxFilesize, 10 * 1024 * 1024);
         this.busyB = 0;
         this.logName = logName;
+        newLogFile(logName, path);
+    }
+
+    private void newLogFile(String logName, String path) {
         File p = new File(path);
         if (!p.exists()) {
             p.mkdirs();
         }
         String filename = StringServant.Instance.join(logFolder, logName, "_", DailyServant.Instance.datetimeLongStringWithoutSep(), ".log");
         try {
-            fos = new FileOutputStream(filename,true);
+            fos = new FileOutputStream(filename, true);
         } catch (FileNotFoundException e) {
 
         }
     }
 
-    public void write(String buffer){
+    public void write(String buffer) {
         byte[] bytes = StringServant.Instance.StringToBytes(buffer);
-        synchronized (this){
-            try {
-                fos.write(bytes);
-                fos.flush();
-                busyB += bytes.length;
-                if(busyB >= maxFilesizeB){
-                    fos.close();
-                    String filename = StringServant.Instance.join(logFolder, logName, "_", DailyServant.Instance.datetimeLongStringWithoutSep(), ".log");
-                    try {
-                        fos = new FileOutputStream(filename,true);
-                    } catch (FileNotFoundException e) {
-
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            fos.write(bytes);
+            fos.flush();
+            busyB += bytes.length;
+            if (busyB >= maxFilesizeB) {
+                fos.close();
+                newLogFile(this.logName,this.logFolder);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void close() {
-        synchronized (this) {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
+    public void repair(String logFolder, String maxFilesize) {
+        this.maxFilesizeB = ConvertServant.Instance.toFileSize(maxFilesize, 10 * 1024 * 1024);
+        this.logFolder = logFolder;
+    }
 }

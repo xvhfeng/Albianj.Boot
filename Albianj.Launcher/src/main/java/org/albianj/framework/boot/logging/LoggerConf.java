@@ -1,11 +1,10 @@
-package org.albianj.framework.boot.logging.impl;
+package org.albianj.framework.boot.logging;
 
 
-import org.albianj.framework.boot.logging.ILoggerConf;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 @BundleSharingTag
-public class LoggerConf implements ILoggerConf {
+public class LoggerConf {
 
     private String loggerName = null;
     private String path = null;
@@ -20,52 +19,42 @@ public class LoggerConf implements ILoggerConf {
         this.openConsole = isOpenConsole;
         this.maxFilesize = maxFilesize;
     }
-    @Override
     public String getLoggerName() {
         return this.loggerName;
     }
 
-    @Override
     public void setLoggerName(String loggerName) {
         this.loggerName = loggerName;
     }
 
-    @Override
     public String getPath() {
         return this.path;
     }
 
-    @Override
     public void setPath(String path) {
         this.path = path;
     }
 
-    @Override
     public String getLevel() {
         return this.level;
     }
 
-    @Override
     public void setLevel(String level) {
         this.level = level;
     }
 
-    @Override
     public boolean isOpenConsole() {
         return this.openConsole;
     }
 
-    @Override
     public void setOpenConsole(boolean openConsole) {
         this.openConsole = openConsole;
     }
 
-    @Override
     public String getMaxFilesize() {
         return this.maxFilesize;
     }
 
-    @Override
     public void setMaxFilesize(String maxFilesize) {
         this.maxFilesize = maxFilesize;
     }

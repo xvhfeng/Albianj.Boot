@@ -2,7 +2,6 @@ package org.albianj.framework.boot;
 
 import org.albianj.framework.boot.loader.AlbianClassLoader;
 import org.albianj.framework.boot.loader.BundleClassLoader;
-import org.albianj.framework.boot.logging.ILogger;
 import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.albianj.framework.boot.logging.LogServant;
@@ -20,7 +19,6 @@ public class BundleContext {
     private ClassLoader classLoader;
     private ThreadGroup threadGroup;
     private String startupType;
-    private ILogger runtimeLogger;
 
     private IBundleListener beginStartupEvent;
     private IBundleListener beginRunEvent;
@@ -53,10 +51,10 @@ public class BundleContext {
         return this;
     }
 
-    public BundleContext setLogger(ILogger runtimeLogger){
-        this.runtimeLogger = runtimeLogger;
-        return this;
-    }
+//    public BundleContext setLogger(ILogger runtimeLogger){
+//        this.runtimeLogger = runtimeLogger;
+//        return this;
+//    }
 
     public BundleContext setBeginStartupEvent(IBundleListener beginStartupEvent){
         this.beginStartupEvent = beginStartupEvent;
@@ -99,10 +97,14 @@ public class BundleContext {
         this.confFolder = this.workPath + "conf" + File.separator;
         this.appsFolder = this.workPath + "apps" + File.separator;
 
-        LogServant.Instance.addRuntimeLog(sessionId, LoggerLevel.Info,this.getClass(),
-                null,"Bundle Runtime Settings.",null,
-                "Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
-                this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder);
+        LogServant.Instance.newLogPacket()
+                .forSessionId(sessionId)
+                .atLevel(LoggerLevel.Info)
+                .byCalled(this.getClass())
+                .takeBrief("Bundle Runtime Settings")
+                .addMessage("Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
+                        this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder)
+                .toLogger();
 
         return this;
     }
@@ -159,9 +161,9 @@ public class BundleContext {
         return new BundleThread(this,name,func);
     }
 
-    public ILogger findLogger() {
-        return runtimeLogger;
-    }
+//    public ILogger findLogger() {
+//        return runtimeLogger;
+//    }
 
     public String findConfigFile(String simpleFileName){
         return this.confFolder + simpleFileName;
@@ -184,39 +186,62 @@ public class BundleContext {
                         Method startup = null;
                         startup = clzz.getMethod("startup",String[].class);
                         if(null == startup){
-                            LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
-                                    this.getClass(),null,"Bundle launcher Error.",null,
-                                    "Bundle -> {0} startup by Class -> {1},but it without method startup(string[] args).Make sure the method is exist",
-                                    bundleName, startupTypeName);
+                            LogServant.Instance.newLogPacket()
+                                    .forSessionId("LaunchThread")
+                                    .atLevel(LoggerLevel.Error)
+                                    .byCalled(this.getClass())
+                                    .alwaysThrow(true)
+                                    .takeBrief("Bundle launcher Error")
+                                    .addMessage("Bundle -> {0} startup by Class -> {1},but it without method startup(string[] args).Make sure the method is exist",
+                                            bundleName, startupTypeName)
+                                    .toLogger();
                         }
                         if(null != beginRunEvent) {
                             beginRunEvent.onActionExecute(ctx);
                         }
                         startup.invoke(launcher,args);
-                        LogServant.Instance.addRuntimeLog("LaunchThread", LoggerLevel.Info,
-                                this.getClass(),null,"Bundle launcher.",null,
-                                "Startup bundle -> {0} with class -> {1} success.",
-                                bundleName, startupTypeName);
-
+                        LogServant.Instance.newLogPacket()
+                                .forSessionId("LaunchThread")
+                                .atLevel(LoggerLevel.Info)
+                                .byCalled(this.getClass())
+                                .takeBrief("Bundle launcher")
+                                .addMessage("Startup bundle -> {0} with class -> {1} success.",
+                                        bundleName, startupTypeName)
+                                .toLogger();
                     } catch (Exception e) {
-                        LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
-                                this.getClass(),e,"Bundle launcher error.",null,
-                                "Startup bundle -> {0} with class -> {1} is error.",
-                                bundleName, startupTypeName);
+                        LogServant.Instance.newLogPacket()
+                                .forSessionId("LaunchThread")
+                                .atLevel(LoggerLevel.Error)
+                                .byCalled(this.getClass())
+                                .withCause(e)
+                                .alwaysThrow(true)
+                                .takeBrief("Bundle launcher error")
+                                .addMessage("Startup bundle -> {0} with class -> {1} is error.",
+                                        bundleName, startupTypeName)
+                                .toLogger();
                     }
                 }
             });
         }catch (Exception e){
-            LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
-                    this.getClass(),e,"Bundle launcher error.",null,
-                    "Open bundle thread to startup bundle -> {0} is error.",
-                    bundleName);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LaunchThread")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("Bundle launcher error")
+                    .addMessage("Open bundle thread to startup bundle -> {0} is error.",
+                            bundleName)
+                    .toLogger();
             return;
         }
         if(null != thread) {
-            LogServant.Instance.addRuntimeLogAndThrow("LaunchThread", LoggerLevel.Info,
-                    this.getClass(),null,"Bundle launcher.",null,
-                    "Startup thread of bundle -> {0}....", bundleName);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("LaunchThread")
+                    .atLevel(LoggerLevel.Info)
+                    .byCalled(this.getClass())
+                    .takeBrief("Bundle launcher")
+                    .addMessage("Startup thread of bundle -> {0}....", bundleName)
+                    .toLogger();
             thread.start();
         }
     }

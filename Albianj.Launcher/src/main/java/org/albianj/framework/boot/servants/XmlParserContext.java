@@ -44,9 +44,15 @@ public class XmlParserContext {
         try {
             ctx = new XmlParserContext(sessionId, filename);
         } catch (Exception e) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    XmlParserContext.class, e, "XmlParser Error.", null,
-                    "New XmlParserContext for xml file -> {0} is fail.", filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(XmlParserContext.class)
+                    .alwaysThrow(true)
+                    .withCause(e)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("New XmlParserContext for xml file -> {0} is fail.", filename)
+                    .toLogger();
         }
         return ctx;
     }
@@ -58,22 +64,38 @@ public class XmlParserContext {
      */
     public XmlParserContext load() {
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(this.filename)) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "The xml filename is null or empty.");
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("The xml filename is null or empty.")
+                    .toLogger();
         }
         if (FileServant.Instance.isFileOrPathNotExist(this.filename)) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "The xml filename -> {0} is not exist.", this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("The xml filename -> {0} is not exist.", this.filename)
+                    .toLogger();
         }
         Document doc = null;
         try {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(this.filename);
         } catch (Exception e) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Load and parser xml filename -> {0} is error.", this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .withCause(e)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Load and parser xml filename -> {0} is error.", this.filename)
+                    .toLogger();
         }
         this.doc = doc;
         XPathFactory xpf = XPathFactory.newInstance();
@@ -94,9 +116,14 @@ public class XmlParserContext {
      */
     public List<Node> selectNodes(String tagName, boolean throwIfNotExist) {
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(tagName)) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Argument tagName -> {0} for parsering conf -> {1} is null or empty.", tagName, this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Argument tagName -> {0} for parsering conf -> {1} is null or empty.", tagName, this.filename)
+                    .toLogger();
         }
         NodeList nodes = null;
         try {
@@ -108,10 +135,14 @@ public class XmlParserContext {
 //        NodeList nodes = doc.getElementsByTagName(tagName);
         if (null == nodes || 0 == nodes.getLength()) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Nodes by tagName -> {0} not in XmlDoc file -> {1}.", tagName, this.filename);
-
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Nodes by tagName -> {0} not in XmlDoc file -> {1}.", tagName, this.filename)
+                        .toLogger();
             }
             return null;
         }
@@ -134,17 +165,26 @@ public class XmlParserContext {
         List<Node> nodes = selectNodes(tagName, false);
         if (null == nodes) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Nodes by tagName -> {0} not in file -> {1}.", tagName, this.filename);
-
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Nodes by tagName -> {0} not in file -> {1}.", tagName, this.filename)
+                        .toLogger();
             }
             return null;
         }
         if (2 <= nodes.size()) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "TagName -> {0} node count ->{1} in file -> {2} is not single.", tagName, nodes.size(), this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("TagName -> {0} node count ->{1} in file -> {2} is not single.", tagName, nodes.size(), this.filename)
+                    .toLogger();
         }
         return nodes.get(0);
     }
@@ -159,11 +199,15 @@ public class XmlParserContext {
     public List<Node> selectNodes(Node parent, String tagName, boolean throwIfNotExist) {
         if (!parent.hasChildNodes()) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Nodes by tagName -> {0} not inside parentNode -> {1} (By the way parentNode has no one childNode.) in file -> {2}.",
-                        tagName, parent.getNodeName(), this.filename);
-
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Nodes by tagName -> {0} not inside parentNode -> {1} (By the way parentNode has no one childNode.) in file -> {2}.",
+                                tagName, parent.getNodeName(), this.filename)
+                        .toLogger();
             }
             return null;
         }
@@ -188,11 +232,15 @@ public class XmlParserContext {
             return list;
         }
         if (throwIfNotExist) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Nodes by tagName -> {0} not inside parentNode -> {1} in file -> {2}.",
-                    tagName, parent.getNodeName(), this.filename);
-
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Nodes by tagName -> {0} not inside parentNode -> {1} in file -> {2}.",
+                            tagName, parent.getNodeName(), this.filename)
+                    .toLogger();
         }
         return null;
     }
@@ -208,18 +256,28 @@ public class XmlParserContext {
         List<Node> nodes = selectNodes(parent, tagName, false);
         if (null == nodes) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Nodes by tagName -> {0} not inside parentNode -> {1} in file -> {2}.",
-                        tagName, parent.getNodeName(), this.filename);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Nodes by tagName -> {0} not inside parentNode -> {1} in file -> {2}.",
+                                tagName, parent.getNodeName(), this.filename)
+                        .toLogger();
 
             }
             return null;
         }
         if (2 <= nodes.size()) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "TagName -> {0} node count ->{1} is not single.", tagName, nodes.size());
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("TagName -> {0} node count ->{1} is not single.", tagName, nodes.size())
+                    .toLogger();
         }
         return nodes.get(0);
     }
@@ -241,10 +299,15 @@ public class XmlParserContext {
         }
 
         if (null == val && allowValueNullOrEmpty) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Attribute or childNode -> {0} not in parent -> {1}.",
-                    attrOrCNodeName, node.getNodeName());
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage( "Attribute or childNode -> {0} not in parent -> {1}.",
+                            attrOrCNodeName, node.getNodeName())
+                    .toLogger();
         }
         return  null == val ? null : val.trim();
     }
@@ -267,10 +330,15 @@ public class XmlParserContext {
     public String findAttributeValue(Node node, String attrName, boolean allowValueNullOrEmpty, boolean throwIfNotExist) {
         if (!node.hasAttributes()) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Node -> {0} has not any attribute in file -> {1}。So attribute -> {2} is not exist.",
-                        node.getNodeName(), this.filename, attrName);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage( "Node -> {0} has not any attribute in file -> {1}。So attribute -> {2} is not exist.",
+                                node.getNodeName(), this.filename, attrName)
+                        .toLogger();
             }
             return null;
         }
@@ -280,19 +348,30 @@ public class XmlParserContext {
         son = nodeMap.getNamedItem(attrName);
         if (null == son) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Attribute -> {0} not in Node -> {1} in file -> {3}.",
-                        attrName, node.getNodeName(), this.filename);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Attribute -> {0} not in Node -> {1} in file -> {3}.",
+                                attrName, node.getNodeName(), this.filename)
+                        .toLogger();
             }
             return null;
         }
         String val = son.getTextContent();
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(val) && !allowValueNullOrEmpty) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Attribute -> {0} value is null or empry in Node -> {1} in file -> {3}.",
-                    attrName, node.getNodeName(), this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Attribute -> {0} value is null or empry in Node -> {1} in file -> {3}.",
+                            attrName, node.getNodeName(), this.filename)
+                    .toLogger();
+
         }
         return  null == val ? null : val.trim();
     }
@@ -305,10 +384,15 @@ public class XmlParserContext {
     public String findChildNodeValue(Node parent, String childNodeName, boolean allowValueNullOrEmpty, boolean throwIfNotExist) {
         if (!parent.hasChildNodes()) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Parent node -> {0} has no one child node in the file -> {1}.",
-                        parent.getNodeName(), this.filename);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Parent node -> {0} has no one child node in the file -> {1}.",
+                                parent.getNodeName(), this.filename)
+                        .toLogger();
             }
             return null;
         }
@@ -316,20 +400,30 @@ public class XmlParserContext {
         Node node = selectNode(parent, childNodeName, false);
         if (null == node) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Parent node -> {0} has no one child node named -> {1} in the file -> {2}.",
-                        parent.getNodeName(), childNodeName, this.filename);
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage("Parent node -> {0} has no one child node named -> {1} in the file -> {2}.",
+                                parent.getNodeName(), childNodeName, this.filename)
+                        .toLogger();
             }
             return null;
         }
 
         String val = node.getTextContent();
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(val) && !allowValueNullOrEmpty) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Node -> {0} inside in parent node -> {1} in the file -> {2} that value is null or empty,but not allow.",
-                    childNodeName, parent.getNodeName(), this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Node -> {0} inside in parent node -> {1} in the file -> {2} that value is null or empty,but not allow.",
+                            childNodeName, parent.getNodeName(), this.filename)
+                    .toLogger();
         }
         return  null == val ? null : val.trim();
 
@@ -343,10 +437,15 @@ public class XmlParserContext {
     public String findNodeValue(Node node, boolean allowValueNullOrEmpty) {
         String val = node.getTextContent();
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(val) && !allowValueNullOrEmpty) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Node -> {0}  in the file -> {2} that value is null or empty,but not allow.",
-                    node.getNodeName(), this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage("Node -> {0}  in the file -> {2} that value is null or empty,but not allow.",
+                            node.getNodeName(), this.filename)
+                    .toLogger();
         }
         return null == val ? null : val.trim();
     }
@@ -360,20 +459,31 @@ public class XmlParserContext {
         Node node = selectNode(nodeName, false);
         if (null == node) {
             if (throwIfNotExist) {
-                LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                        this.getClass(), null, "XmlParser Error.", null,
-                        "Nodes by tagName -> {0} not in file -> {1}.",
-                        nodeName, this.filename);
-
+                LogServant.Instance.newLogPacket()
+                        .forSessionId(sessionId)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .takeBrief("XmlParser Error")
+                        .addMessage( sessionId, LoggerLevel.Error,
+                                this.getClass(), null, "XmlParser Error.", null,
+                                "Nodes by tagName -> {0} not in file -> {1}.",
+                                nodeName, this.filename)
+                        .toLogger();
             }
             return null;
         }
         String val = node.getTextContent();
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(val) && !allowValueNullOrEmpty) {
-            LogServant.Instance.addRuntimeLogAndThrow(sessionId, LoggerLevel.Error,
-                    this.getClass(), null, "XmlParser Error.", null,
-                    "Node -> {0}  in the file -> {2} that value is null or empty,but not allow.",
-                    node.getNodeName(), this.filename);
+            LogServant.Instance.newLogPacket()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .alwaysThrow(true)
+                    .takeBrief("XmlParser Error")
+                    .addMessage( "Node -> {0}  in the file -> {2} that value is null or empty,but not allow.",
+                            node.getNodeName(), this.filename)
+                    .toLogger();
         }
         return null == val ? null : val.trim();
     }

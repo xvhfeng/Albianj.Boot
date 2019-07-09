@@ -1,13 +1,7 @@
 package org.albianj.framework.boot.logging;
 
-import org.albianj.framework.boot.BundleContext;
-import org.albianj.framework.boot.except.DisplayException;
-import org.albianj.framework.boot.except.HiddenException;
-import org.albianj.framework.boot.except.ThrowableServant;
-import org.albianj.framework.boot.logging.impl.Logger;
-import org.albianj.framework.boot.servants.StringServant;
+
 import org.albianj.framework.boot.tags.BundleSharingTag;
-import org.albianj.framework.boot.ApplicationContext;
 
 /**
  * 日志的实用类,所有的日志都由这个类在使用.
@@ -25,7 +19,7 @@ import org.albianj.framework.boot.ApplicationContext;
 @BundleSharingTag
 public class LogServant {
 
-    public final static String RuntimeLogNameDef = "Runtime";
+    public final static String RuntimeLogNameDef = "Runtimes";
     public final static String RuntimeLogLevelDef="DEBUG";
 
     public static LogServant Instance = null;
@@ -40,108 +34,112 @@ public class LogServant {
 
     }
 
-    public void newRuntimeLogger(String logName,String logsFolder,String level,boolean isOpenConsole){
-        ILogger logger =  new Logger(logName,logsFolder,level,isOpenConsole);
-        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
-        if(null == bundleContext) {
-            ApplicationContext.Instance.setLogger(logger);
-        } else {
-            bundleContext.setLogger(logger);
-        }
-    }
+//    public void newRuntimeLogger(String logName,String logsFolder,String level,boolean isOpenConsole){
+//        ILogger logger =  new Logger(logName,logsFolder,level,isOpenConsole);
+//        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
+//        if(null == bundleContext) {
+//            ApplicationContext.Instance.setLogger(logger);
+//        } else {
+//            bundleContext.setLogger(logger);
+//        }
+//    }
+//
+//    public void newRuntimeLogger(ILoggerConf logAttr){
+//        this.newRuntimeLogger(logAttr.getLoggerName(),logAttr.getPath(),logAttr.getLevel(),logAttr.isOpenConsole());
+//    }
+//
+//    public void updateRuntimeLogger(String level,boolean isOpenConsole,String maxFilesize){
+//        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
+//        ILogger logger = null;
+//        if(null == bundleContext) {
+//            logger = ApplicationContext.Instance.findLogger();
+//        } else {
+//            logger = bundleContext.findLogger();
+//        }
+//        if(isOpenConsole && !logger.isConsoleAppenderOpened()){
+//            logger.openConsoleAppender();
+//        } else {
+//            if(logger.isConsoleAppenderOpened()){
+//                logger.closeConsoleAppender();
+//            }
+//        }
+//
+//        logger.setLoggerLevel(level);
+//        logger.setMaxFilesize(maxFilesize);
+//    }
+//
+//    /**
+//     *  记录日志
+//     *
+//     *  优先记录到当前bundle的RuntimeLogger，如果当前的bundle没有找到，或者当前bundle的RuntimeLogger未初始化，记录到bootBundle的Runtime
+//     *  so，必须确保在执行该方法前已经存在RuntimeLogger。
+//     *
+//     * @param sessionId 当前执行方法的人员或者userid，不要为空
+//     * @param level 日志的级别
+//     * @param refType 当前记录日志的class，不能为空
+//     * @param e 当前抛出的系统异常，如没有，赋值null
+//     * @param brief 日志的简短秒数，比如，User Error 或者 XmlParser Error
+//     * @param secretMsg 带有敏感信息的记录内容，注意该内容不能直接抛出，如没有，直接复制null
+//     * @param fmt 日志的格式化字段，使用位置为索引。例如"Workfolder ->{0} is not exist,but it must setting by class -> {1}.",workFolder,mainClzz.getName()
+//     * @param objs 供日志格式化字段使用的参数
+//     */
+//    public void addRuntimeLog(String sessionId, LoggerLevel level, Class<?> refType, Throwable e, String brief, String secretMsg, String fmt, Object... objs) {
+//       BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
+//        String msg = StringServant.Instance.format(fmt,objs);
+//        ILogger logger = null;
+//        if(null == bundleContext){
+//            logger = ApplicationContext.Instance.findLogger();
+//        } else {
+//            logger = bundleContext.findLogger();
+//            if (null == logger) {
+//                logger = ApplicationContext.Instance.findLogger();
+//            }
+//        }
+//       logger.log(sessionId, null == bundleContext ? "Application" : bundleContext.getBundleName(), level,  refType, e,brief,secretMsg, msg);
+//       return;
+//    }
+//
+//    /**
+//     *  记录日志，并且抛出异常
+//     *
+//     *  当secretMsg 为null，为空或者都为空格时，抛出AlbianExterException，反之，抛出抛出AlbianInterException
+//     *
+//     *  优先记录到当前bundle的RuntimeLogger，如果当前的bundle没有找到，或者当前bundle的RuntimeLogger未初始化，记录到bootBundle的Runtime
+//     *  so，必须确保在执行该方法前已经存在RuntimeLogger。
+//     *
+//     * @param sessionId 当前执行方法的人员或者userid，不要为空
+//     * @param level 日志的级别
+//     * @param refType 当前记录日志的class，不能为空
+//     * @param e 当前抛出的系统异常，如没有，赋值null
+//     * @param brief 日志的简短秒数，比如，User Error 或者 XmlParser Error
+//     * @param secretMsg 带有敏感信息的记录内容，注意该内容不能直接抛出，如没有，直接复制null
+//     * @param fmt 日志的格式化字段，使用位置为索引。例如"Workfolder ->{0} is not exist,but it must setting by class -> {1}.",workFolder,mainClzz.getName()
+//     * @param objs 供日志格式化字段使用的参数
+//     */
+//    public void addRuntimeLogAndThrow(String sessionId, LoggerLevel level, Class<?> refType, Throwable e, String brief, String secretMsg, String fmt, Object... objs){
+//        addRuntimeLog(sessionId,level,refType,e,brief,secretMsg,fmt,objs);
+//        if(e instanceof HiddenException) {
+//            throw (HiddenException) e;
+//        }
+//        if(e instanceof DisplayException) {
+//                throw (DisplayException) e;
+//        }
+//        String msg = StringServant.Instance.format(fmt,objs);
+//        if(!StringServant.Instance.isNullOrEmptyOrAllSpace(secretMsg)){
+//            ThrowableServant.Instance.throwHiddenException(refType,e,secretMsg, brief, msg);
+//        }
+//        ThrowableServant.Instance.throwDisplayException(refType,e, brief, msg);
+//    }
 
-    public void newRuntimeLogger(ILoggerConf logAttr){
-        this.newRuntimeLogger(logAttr.getLoggerName(),logAttr.getPath(),logAttr.getLevel(),logAttr.isOpenConsole());
-    }
-
-    public void updateRuntimeLogger(String level,boolean isOpenConsole,String maxFilesize){
-        BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
-        ILogger logger = null;
-        if(null == bundleContext) {
-            logger = ApplicationContext.Instance.findLogger();
-        } else {
-            logger = bundleContext.findLogger();
-        }
-        if(isOpenConsole && !logger.isConsoleAppenderOpened()){
-            logger.openConsoleAppender();
-        } else {
-            if(logger.isConsoleAppenderOpened()){
-                logger.closeConsoleAppender();
-            }
-        }
-
-        logger.setLoggerLevel(level);
-        logger.setMaxFilesize(maxFilesize);
-    }
-
-    /**
-     *  记录日志
-     *
-     *  优先记录到当前bundle的RuntimeLogger，如果当前的bundle没有找到，或者当前bundle的RuntimeLogger未初始化，记录到bootBundle的Runtime
-     *  so，必须确保在执行该方法前已经存在RuntimeLogger。
-     *
-     * @param sessionId 当前执行方法的人员或者userid，不要为空
-     * @param level 日志的级别
-     * @param refType 当前记录日志的class，不能为空
-     * @param e 当前抛出的系统异常，如没有，赋值null
-     * @param brief 日志的简短秒数，比如，User Error 或者 XmlParser Error
-     * @param secretMsg 带有敏感信息的记录内容，注意该内容不能直接抛出，如没有，直接复制null
-     * @param fmt 日志的格式化字段，使用位置为索引。例如"Workfolder ->{0} is not exist,but it must setting by class -> {1}.",workFolder,mainClzz.getName()
-     * @param objs 供日志格式化字段使用的参数
-     */
-    public void addRuntimeLog(String sessionId, LoggerLevel level, Class<?> refType, Throwable e, String brief, String secretMsg, String fmt, Object... objs) {
-       BundleContext bundleContext = ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
-        String msg = StringServant.Instance.format(fmt,objs);
-        ILogger logger = null;
-        if(null == bundleContext){
-            logger = ApplicationContext.Instance.findLogger();
-        } else {
-            logger = bundleContext.findLogger();
-            if (null == logger) {
-                logger = ApplicationContext.Instance.findLogger();
-            }
-        }
-       logger.log(sessionId, null == bundleContext ? "Application" : bundleContext.getBundleName(), level,  refType, e,brief,secretMsg, msg);
-       return;
-    }
-
-    /**
-     *  记录日志，并且抛出异常
-     *
-     *  当secretMsg 为null，为空或者都为空格时，抛出AlbianExterException，反之，抛出抛出AlbianInterException
-     *
-     *  优先记录到当前bundle的RuntimeLogger，如果当前的bundle没有找到，或者当前bundle的RuntimeLogger未初始化，记录到bootBundle的Runtime
-     *  so，必须确保在执行该方法前已经存在RuntimeLogger。
-     *
-     * @param sessionId 当前执行方法的人员或者userid，不要为空
-     * @param level 日志的级别
-     * @param refType 当前记录日志的class，不能为空
-     * @param e 当前抛出的系统异常，如没有，赋值null
-     * @param brief 日志的简短秒数，比如，User Error 或者 XmlParser Error
-     * @param secretMsg 带有敏感信息的记录内容，注意该内容不能直接抛出，如没有，直接复制null
-     * @param fmt 日志的格式化字段，使用位置为索引。例如"Workfolder ->{0} is not exist,but it must setting by class -> {1}.",workFolder,mainClzz.getName()
-     * @param objs 供日志格式化字段使用的参数
-     */
-    public void addRuntimeLogAndThrow(String sessionId, LoggerLevel level, Class<?> refType, Throwable e, String brief, String secretMsg, String fmt, Object... objs){
-        addRuntimeLog(sessionId,level,refType,e,brief,secretMsg,fmt,objs);
-        if(e instanceof HiddenException) {
-            throw (HiddenException) e;
-        }
-        if(e instanceof DisplayException) {
-                throw (DisplayException) e;
-        }
-        String msg = StringServant.Instance.format(fmt,objs);
-        if(!StringServant.Instance.isNullOrEmptyOrAllSpace(secretMsg)){
-            ThrowableServant.Instance.throwHiddenException(refType,e,secretMsg, brief, msg);
-        }
-        ThrowableServant.Instance.throwDisplayException(refType,e, brief, msg);
+    public void init(String logName,String logsFolder,String level,boolean isOpenConsole){
+        LogManager.Instance.init(logName,logsFolder,level,isOpenConsole);
     }
 
     public LogPacket newLogPacket(){
         return new LogPacket();
     }
 
-    public void repair(ILoggerConf logAttr){
-        LogMgr.Instance.putConf(logAttr);
+    public void repair(LoggerConf logAttr){
+        LogManager.Instance.repair(logAttr);
     }
 }

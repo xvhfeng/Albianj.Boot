@@ -99,9 +99,11 @@ public class DailyServant {
      * 获取完全格式的的日期格式,包括毫秒
      * @return 格式如 2015-10-31 10:33:25:012
      */
-    public String getFullDateTimeString(){
+
+    public String datetimeLongStringWithMillis(long timeMS){
         StringBuffer sb = new StringBuffer(30);
-        Calendar nowtime = Calendar.getInstance();
+        Calendar nowtime = Calendar.getInstance(TimeZone.getDefault());
+        nowtime.setTimeInMillis(timeMS);
         int _year = nowtime.get(Calendar.YEAR); //获取年数
         int _month = nowtime.get(Calendar.MONTH) + 1; //获取月数（Java中默认为0-11）
         int _day = nowtime.get(Calendar.DAY_OF_MONTH); //获取天数
@@ -145,6 +147,10 @@ public class DailyServant {
         sb.append(_millisecond);
 
         return sb.toString();
+    }
+
+    public String datetimeLongStringWithMillis(){
+        return datetimeLongStringWithMillis(System.currentTimeMillis());
     }
 
 }

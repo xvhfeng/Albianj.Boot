@@ -36,10 +36,18 @@ public class BundleThread extends Thread {
         try {
             super.run();
         }catch (Throwable e){
-            LogServant.Instance.addRuntimeLogAndThrow("BundleThread", LoggerLevel.Info,
-                    this.getClass(),e,"BundleThread executer error.",null,
-                    "execute bundle -> {0} thread  is error,then exit thread...",
-                    bundleContext.getBundleName());
+            LogServant.Instance.newLogPacket()
+                    .forSessionId("BundleThread")
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .inBundle(bundleContext.getBundleName())
+                    .withCause(e)
+                    .alwaysThrow(true)
+                    .takeBrief("BundleThread executer error")
+                    .addMessage("execute bundle -> {0} thread  is error,then exit thread...",
+                            bundleContext.getBundleName())
+                    .toLogger();
+
         }finally {
             return;
         }

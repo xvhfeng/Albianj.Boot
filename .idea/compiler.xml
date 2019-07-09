@@ -10,8 +10,5 @@
         <module name="Albianj.Launcher.Test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Albianj.Launcher.Test" target="1.7" />
-    </bytecodeTargetLevel>
   </component>
 </project>
