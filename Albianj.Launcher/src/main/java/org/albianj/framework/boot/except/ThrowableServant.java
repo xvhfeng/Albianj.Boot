@@ -4,6 +4,8 @@ package org.albianj.framework.boot.except;
 import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.util.Stack;
 
 @BundleSharingTag
@@ -127,6 +129,20 @@ public class ThrowableServant {
             sb.append("}");
         }
         return sb;
+    }
+
+    /**
+     * 将异常的堆栈信息转为字符串
+     * @param e 异常
+     * @return 异常的字符串描述
+     */
+    public String printThrowStackTrace(Throwable e) {
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        PrintWriter pw = new PrintWriter(bo);
+        e.printStackTrace(pw);
+        pw.flush();
+        pw.close();
+        return bo.toString();
     }
 
     public void throwDisplayException(Class<?> refType, Throwable interThrow, String brief, String fmt, Object...obj) {

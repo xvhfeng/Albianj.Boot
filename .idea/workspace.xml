@@ -2,71 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1c4cd276-c6d0-488a-b8ec-a927afb81f2d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher.Test/Albianj.Launcher.Test.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher.Test/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher.Test/src/main/java/org/albianj/framework/boot/MainApp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher.Test/src/main/resources/conf/application.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/hooks/HookContext.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/history" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogFileItem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogMgr.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogPacket.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/AlbianClassScanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/AlbianClassScanner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/ApplicationContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/ApplicationContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/BundleContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/BundleContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/BundleThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/BundleThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/FinalAlbianReflectService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/FinalAlbianReflectService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/IAlbianClassExcavator.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/IAlbianClassExcavator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/IAlbianClassFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/IAlbianClassFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/IBundleListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/IBundleListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/confs/AppConf.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/confs/AppConf.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/confs/BundleConf.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/confs/BundleConf.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/except/DisplayException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/DisplayException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/except/HiddenException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/HiddenException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/except/LocationInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/LocationInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/loader/AlbianClassLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/AlbianClassLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/loader/BundleClassLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/BundleClassLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/loader/TypeFileMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/TypeFileMetadata.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/locker/MutexLockerContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/locker/MutexLockerContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/ILogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/ILoggerAppender.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILoggerAppender.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/ILoggerConf.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILoggerConf.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/LogServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/LoggerLevel.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LoggerLevel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/BufferAppender.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/BufferAppender.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/ConsoleAppender.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/ConsoleAppender.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/Logger.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/Logger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/LoggerConf.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerConf.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/CollectServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/CollectServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/ConvertServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/ConvertServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/DailyServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/FileServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/FileServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/RefArg.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/RefArg.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/StringServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/StringServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/TypeServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/TypeServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/servants/XmlParserContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/XmlParserContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/tags/BundleSharingTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/tags/BundleSharingTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/tags/CommentsTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/tags/CommentsTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/tags/SpecialWarningTag.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/tags/SpecialWarningTag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/ITimeoutEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/ITimeoutEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/ITimer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/ITimer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/ITimerTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/ITimerTask.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/RBTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/RBTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/RBTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/RBTreeNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/impl/TimerServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/impl/TimerServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/timer/impl/TimerWheel.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/timer/impl/TimerWheel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-cli/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-cli/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/StringServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/StringServant.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -82,13 +26,14 @@
     <session id="1415807785">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.23" value="1" />
           <entry key="project.open.time.3" value="2" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.opened" value="6" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -96,7 +41,7 @@
           <entry key="class" value="1" />
           <entry key="history" value="1" />
           <entry key="iml" value="1" />
-          <entry key="java" value="306" />
+          <entry key="java" value="323" />
           <entry key="log" value="3" />
           <entry key="xml" value="19" />
         </counts>
@@ -105,7 +50,7 @@
         <counts>
           <entry key="CLASS" value="1" />
           <entry key="IDEA_MODULE" value="1" />
-          <entry key="JAVA" value="306" />
+          <entry key="JAVA" value="323" />
           <entry key="PLAIN_TEXT" value="4" />
           <entry key="XML" value="19" />
         </counts>
@@ -114,13 +59,13 @@
         <counts>
           <entry key="dummy" value="23" />
           <entry key="history" value="22" />
-          <entry key="java" value="8700" />
+          <entry key="java" value="11825" />
           <entry key="xml" value="85" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="8700" />
+          <entry key="JAVA" value="11825" />
           <entry key="PLAIN_TEXT" value="45" />
           <entry key="XML" value="85" />
         </counts>
@@ -130,24 +75,79 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/Logger.java">
+        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="44" column="9" lean-forward="true" selection-start-line="44" selection-start-column="9" selection-end-line="44" selection-end-column="9" />
+            <state relative-caret-position="80">
+              <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1201#1202#0" expanded="true" />
-                <element signature="e#1246#1247#0" expanded="true" />
+                <element signature="method#newRuntimeLogger#0;class#LogServant#0" />
+                <element signature="method#newRuntimeLogger#1;class#LogServant#0" />
+                <element signature="method#updateRuntimeLogger#0;class#LogServant#0" />
+                <element signature="docComment;method#addRuntimeLog#0;class#LogServant#0" />
+                <element signature="method#addRuntimeLog#0;class#LogServant#0" />
+                <element signature="docComment;method#addRuntimeLogAndThrow#0;class#LogServant#0" />
+                <element signature="method#addRuntimeLogAndThrow#0;class#LogServant#0" />
+                <element signature="e#5630#5631#0" expanded="true" />
+                <element signature="e#5665#5666#0" expanded="true" />
+                <element signature="e#5705#5706#0" expanded="true" />
+                <element signature="e#5735#5736#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/hooks/HookContext.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogContext.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="8" selection-start-line="8" selection-end-line="8" />
+            <state relative-caret-position="525">
+              <caret line="30" column="42" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogMgr.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="400">
+              <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#459#578#0" expanded="true" />
+                <element signature="e#577#578#0" expanded="true" />
+                <element signature="e#1386#1387#0" expanded="true" />
+                <element signature="e#1447#1448#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogFileItem.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="635">
+              <caret line="59" column="25" selection-start-line="59" selection-start-column="25" selection-end-line="59" selection-end-column="25" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogPacket.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="555">
+              <caret line="77" column="29" lean-forward="true" selection-start-line="77" selection-start-column="29" selection-end-line="77" selection-end-column="29" />
+              <folding>
+                <element signature="e#445#446#0" expanded="true" />
+                <element signature="e#505#506#0" expanded="true" />
+                <element signature="e#1842#1843#0" expanded="true" />
+                <element signature="e#1863#1864#0" expanded="true" />
+                <element signature="e#1877#1878#0" expanded="true" />
+                <element signature="e#1905#1906#0" expanded="true" />
+                <element signature="e#1975#1976#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -165,6 +165,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>Runtime</find>
+      <find>；</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -173,16 +174,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/helpers/XmlParserContext.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/BufferAppender.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/ConsoleAppender.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/Logger.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/BootServant.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/loader/TypeFileMetadata.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/helpers/FileServant.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/helpers/OptConvertServant.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/helpers/ConvertServant.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/albianj/framework/boot/loader/BundleClassLoader.java" />
@@ -214,7 +205,6 @@
         <option value="$PROJECT_DIR$/Albianj.Launcher.Test/src/main/resources/config/app.xml" />
         <option value="$PROJECT_DIR$/Albianj.Launcher.Test/src/main/resources/config/application.xml" />
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/TypeFileMetadata.java" />
-        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java" />
         <option value="$PROJECT_DIR$/Albianj.Launcher.Test/src/main/java/org/albianj/framework/boot/MainApp.java" />
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java" />
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java" />
@@ -224,6 +214,17 @@
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/XmlParserContext.java" />
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/ApplicationContext.java" />
         <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/hooks/HookContext.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LoggerContext.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LoggerData.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogPkg.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogPacket.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/StringServant.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogContext.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogFileItem.java" />
+        <option value="$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogMgr.java" />
       </list>
     </option>
   </component>
@@ -268,18 +269,16 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1928" />
-    <option name="y" value="785" />
-    <option name="width" value="1936" />
-    <option name="height" value="1015" />
+    <option name="x" value="-15" />
+    <option name="y" value="-15" />
+    <option name="width" value="3033" />
+    <option name="height" value="1933" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -330,7 +329,68 @@
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="except" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
               <item name="hooks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="loader" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="locker" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="logging" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="logging" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Albianj.Boot" type="462c0819:PsiDirectoryNode" />
+              <item name="Albianj.Launcher" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="boot" type="462c0819:PsiDirectoryNode" />
+              <item name="servants" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Albianj.Boot" type="b2602c69:ProjectViewProjectNode" />
@@ -409,15 +469,17 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1562580198422" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1562669353047" />
     <property name="extract.method.default.visibility" value="protected" />
     <property name="jdk.selected.JAVA_MODULE" value="1.7" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/flogger-master" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/FLogger-master (1)/FLogger-master" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Modules" />
@@ -527,25 +589,25 @@
       <workItem from="1562551004863" duration="2730000" />
       <workItem from="1562555338703" duration="655000" />
       <workItem from="1562556019466" duration="342000" />
-      <workItem from="1562556487992" duration="12631000" />
+      <workItem from="1562556487992" duration="13304000" />
+      <workItem from="1562638256568" duration="18212000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66732000" />
+    <option name="totallyTimeSpent" value="85617000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1928" y="785" width="1936" height="1015" extended-state="6" />
+    <frame x="-6" y="-6" width="1213" height="773" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17963752" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29386345" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" weight="0.32954547" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3284091" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3284091" />
@@ -557,6 +619,7 @@
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="10" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32954547" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -617,12 +680,6 @@
           <line>186</line>
           <properties />
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java</url>
-          <line>50</line>
-          <properties />
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java</url>
@@ -705,95 +762,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/TypeServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerConf.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/confs/BundleConf.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="13" column="5" lean-forward="true" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/DisplayException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/HiddenException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/LocationInfo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/AlbianClassLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25">
-          <caret line="57" column="13" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#loadAllClass#0;class#AlbianClassLoader#0" />
-            <element signature="method#loadSpxLib#0;class#AlbianClassLoader#0" />
-            <element signature="method#findSpxFile#0;class#AlbianClassLoader#0" />
-            <element signature="method#checkSpxFileVersion#0;class#AlbianClassLoader#0" />
-            <element signature="method#unpackSpxFile#0;class#AlbianClassLoader#0" />
-            <element signature="method#parserSpxFileToBytes#0;class#AlbianClassLoader#0" />
-            <element signature="method#scanSingleJarInSpxLib#0;class#AlbianClassLoader#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/loader/BundleClassLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="117" column="66" lean-forward="true" selection-start-line="117" selection-start-column="32" selection-end-line="117" selection-end-column="66" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#loadClass#0;class#BundleClassLoader#0" />
-            <element signature="method#loadClass#1;class#BundleClassLoader#0" />
-            <element signature="method#scanClassesFile#0;class#BundleClassLoader#0" />
-            <element signature="method#scanJarFolder#0;class#BundleClassLoader#0" />
-            <element signature="method#getRelPath#0;class#BundleClassLoader#0" />
-            <element signature="docComment;method#loadAllClass#0;class#BundleClassLoader#0" />
-            <element signature="method#loadAllClass#0;class#BundleClassLoader#0" />
-            <element signature="docComment;method#loadAllClass#1;class#BundleClassLoader#0" />
-            <element signature="docComment;method#findNormalTypeWithParent#0;class#BundleClassLoader#0" />
-            <element signature="method#findNormalTypeWithParentAndAnno#0;class#BundleClassLoader#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/locker/MutexLockerContext.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="197">
@@ -815,13 +783,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILoggerConf.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="7" column="11" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -952,20 +913,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="77" column="5" lean-forward="true" selection-start-line="77" selection-start-column="5" selection-end-line="77" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="103">
-          <caret line="39" column="48" lean-forward="true" selection-start-line="39" selection-start-column="48" selection-end-line="39" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.7.0_79/src.zip!/java/lang/Thread.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2454">
@@ -1005,38 +952,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="20" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="57" selection-start-line="57" selection-end-line="57" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1962#2132#0" expanded="true" />
-            <element signature="e#2131#2132#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/BufferAppender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="136" selection-start-line="136" selection-end-line="136" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1107,10 +1022,109 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/hooks/HookContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILogger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="575">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/DailyServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="87" lean-forward="true" selection-start-line="87" selection-end-line="87" />
+          <folding>
+            <element signature="method#getFullDateTimeString#0;class#DailyServant#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/except/ThrowableServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="588">
+          <caret line="137" column="7" lean-forward="true" selection-start-line="137" selection-start-column="7" selection-end-line="137" selection-end-column="7" />
+          <folding>
+            <element signature="method#printThrowStackTrace#0;class#ThrowableServant#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LayoutServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="46" column="5" lean-forward="true" selection-start-line="33" selection-start-column="4" selection-end-line="46" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/ILoggerConf.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="250">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/servants/StringServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="142" column="7" lean-forward="true" selection-start-line="142" selection-start-column="7" selection-end-line="142" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerConf.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="7" column="46" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.7.0_79/src.zip!/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="266" column="19" selection-start-line="266" selection-start-column="19" selection-end-line="266" selection-end-column="19" />
+          <folding>
+            <element signature="e#9585#9586#0" expanded="true" />
+            <element signature="e#9617#9618#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/BufferAppender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5">
+          <caret line="18" column="22" lean-forward="true" selection-start-line="18" selection-start-column="22" selection-end-line="18" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogPacket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="555">
+          <caret line="77" column="29" lean-forward="true" selection-start-line="77" selection-start-column="29" selection-end-line="77" selection-end-column="29" />
+          <folding>
+            <element signature="e#445#446#0" expanded="true" />
+            <element signature="e#505#506#0" expanded="true" />
+            <element signature="e#1842#1843#0" expanded="true" />
+            <element signature="e#1863#1864#0" expanded="true" />
+            <element signature="e#1877#1878#0" expanded="true" />
+            <element signature="e#1905#1906#0" expanded="true" />
+            <element signature="e#1975#1976#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/Logger.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="44" column="9" lean-forward="true" selection-start-line="44" selection-start-column="9" selection-end-line="44" selection-end-column="9" />
+        <state relative-caret-position="1905">
+          <caret line="84" column="48" lean-forward="true" selection-start-line="84" selection-start-column="21" selection-end-line="84" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1201#1202#0" expanded="true" />
@@ -1119,10 +1133,65 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/hooks/HookContext.java">
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/impl/LoggerFile.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
+        <state relative-caret-position="225">
+          <caret line="42" column="41" lean-forward="true" selection-start-line="42" selection-start-column="41" selection-end-line="42" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogFileItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="635">
+          <caret line="59" column="25" selection-start-line="59" selection-start-column="25" selection-end-line="59" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#newRuntimeLogger#0;class#LogServant#0" />
+            <element signature="method#newRuntimeLogger#1;class#LogServant#0" />
+            <element signature="method#updateRuntimeLogger#0;class#LogServant#0" />
+            <element signature="docComment;method#addRuntimeLog#0;class#LogServant#0" />
+            <element signature="method#addRuntimeLog#0;class#LogServant#0" />
+            <element signature="docComment;method#addRuntimeLogAndThrow#0;class#LogServant#0" />
+            <element signature="method#addRuntimeLogAndThrow#0;class#LogServant#0" />
+            <element signature="e#5630#5631#0" expanded="true" />
+            <element signature="e#5665#5666#0" expanded="true" />
+            <element signature="e#5705#5706#0" expanded="true" />
+            <element signature="e#5735#5736#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="30" column="42" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Albianj.Launcher/src/main/java/org/albianj/framework/boot/logging/LogMgr.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#459#578#0" expanded="true" />
+            <element signature="e#577#578#0" expanded="true" />
+            <element signature="e#1386#1387#0" expanded="true" />
+            <element signature="e#1447#1448#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -136,4 +136,12 @@ public class LogServant {
         }
         ThrowableServant.Instance.throwDisplayException(refType,e, brief, msg);
     }
+
+    public LogPacket newLogPacket(){
+        return new LogPacket();
+    }
+
+    public void repair(ILoggerConf logAttr){
+        LogMgr.Instance.putConf(logAttr);
+    }
 }

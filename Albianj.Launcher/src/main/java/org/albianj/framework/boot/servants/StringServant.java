@@ -135,4 +135,22 @@ public class StringServant {
 
         return String.format(formatter.toString(), valueList.toArray());
     }
+
+    /**
+     * 将字符串转为字节数组
+     * @param str 源字符串
+     * @return 字节数组
+     */
+    public byte[] StringToBytes(String str) {
+        try{
+            if(str == null || str.length() <= 0){
+                return new byte[0];
+            }else{
+                return str.getBytes("utf-8");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
