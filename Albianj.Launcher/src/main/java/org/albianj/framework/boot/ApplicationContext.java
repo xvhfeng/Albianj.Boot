@@ -195,6 +195,16 @@ public class ApplicationContext {
             this.phase = Phase.PrepareEnd;
             buildApplicationRuntime(args);
             this.phase = Phase.Run;
+            for(int i = 0; i <200000; i++){
+                LogServant.Instance.newLogPacket()
+                        .forSessionId("StartupThread")
+                        .atLevel(LoggerLevel.Info)
+                        .byCalled(this.getClass())
+                        .takeBrief("Albianj Application Startup")
+                        .addMessage("{2} Albianj application startuping by using RuntimeLogger with folder -> {0} and {1} open ConsoleLogger.",
+                                logsPath, isOpenConsole ? "" : "not",i)
+                        .toLogger();
+            }
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             try {
