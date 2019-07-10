@@ -198,7 +198,7 @@ public class ApplicationContext {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             try {
-                Thread.sleep(5000); //wait io flush
+                Thread.sleep(1000); //wait io flush
             } catch (InterruptedException e1) {
 
             }
