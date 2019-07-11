@@ -3,6 +3,7 @@ package org.albianj.framework.boot;
 import org.albianj.framework.boot.loader.AlbianClassLoader;
 import org.albianj.framework.boot.loader.BundleClassLoader;
 import org.albianj.framework.boot.logging.LoggerLevel;
+import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.albianj.framework.boot.logging.LogServant;
 
@@ -47,14 +48,34 @@ public class BundleContext {
     }
 
     public BundleContext setWorkFolder(String workFolder){
-        this.workPath = workFolder;
+        this.workPath = workFolder.endsWith(File.separator) ? workFolder : workFolder +File.separator;
         return this;
     }
 
-//    public BundleContext setLogger(ILogger runtimeLogger){
-//        this.runtimeLogger = runtimeLogger;
-//        return this;
-//    }
+    public BundleContext setBinFolder(String binFolder){
+        this.binFolder = binFolder.endsWith(File.separator) ? binFolder : binFolder +File.separator;
+        return this;
+    }
+
+    public BundleContext setLibFolder(String libFolder){
+        this.libFolder = libFolder.endsWith(File.separator) ? libFolder : libFolder +File.separator;
+        return this;
+    }
+
+    public BundleContext setClassesFolder(String classesFolder){
+        this.classesFolder = classesFolder.endsWith(File.separator) ? classesFolder : classesFolder +File.separator;
+        return this;
+    }
+
+    public BundleContext setConfFolder(String confFolder){
+        this.confFolder = confFolder.endsWith(File.separator) ? confFolder : confFolder +File.separator;
+        return this;
+    }
+
+    public BundleContext setAppsFolder(String appsFolder){
+        this.appsFolder = appsFolder.endsWith(File.separator) ? appsFolder : appsFolder +File.separator;
+        return this;
+    }
 
     public BundleContext setBeginStartupEvent(IBundleListener beginStartupEvent){
         this.beginStartupEvent = beginStartupEvent;
@@ -91,11 +112,6 @@ public class BundleContext {
         }
         threadGroup = new ThreadGroup(bundleName);
         threadGroup.setDaemon(true);
-        this.binFolder = this.workPath + "bin" + File.separator;
-        this.libFolder = this.workPath + "lib" + File.separator;
-        this.classesFolder = this.workPath + "classes" + File.separator;
-        this.confFolder = this.workPath + "conf" + File.separator;
-        this.appsFolder = this.workPath + "apps" + File.separator;
 
         LogServant.Instance.newLogPacket()
                 .forSessionId(sessionId)
@@ -126,23 +142,28 @@ public class BundleContext {
     }
 
     public String getBinFolder() {
-        return workPath + "bin" + File.pathSeparator;
+        return StringServant.Instance.isNullOrEmptyOrAllSpace(this.binFolder)
+         ? workPath + "bin" + File.pathSeparator : this.binFolder;
     }
 
     public String getLibFolder() {
-        return workPath + "lib" + File.pathSeparator;
+        return StringServant.Instance.isNullOrEmptyOrAllSpace(this.libFolder)
+                ? workPath + "lib" + File.pathSeparator : this.libFolder;
     }
 
     public String getClassesFolder() {
-        return workPath + "classes" + File.pathSeparator;
+        return StringServant.Instance.isNullOrEmptyOrAllSpace(this.classesFolder)
+                ? workPath + "classes" + File.pathSeparator : this.classesFolder;
     }
 
     public String getConfFolder() {
-        return workPath + "conf" + File.pathSeparator;
+        return StringServant.Instance.isNullOrEmptyOrAllSpace(this.confFolder)
+                ? workPath + "conf" + File.pathSeparator : this.confFolder;
     }
 
     public String getAppsFolder() {
-        return workPath + "apps" + File.pathSeparator;
+        return StringServant.Instance.isNullOrEmptyOrAllSpace(this.appsFolder)
+                ? workPath + "apps" + File.pathSeparator : this.appsFolder;
     }
 
     public String getBundleName() {
@@ -161,12 +182,8 @@ public class BundleContext {
         return new BundleThread(this,name,func);
     }
 
-//    public ILogger findLogger() {
-//        return runtimeLogger;
-//    }
-
     public String findConfigFile(String simpleFileName){
-        return this.confFolder + simpleFileName;
+        return this.getConfFolder() + simpleFileName;
     }
 
     public void startup(final String[] args){
@@ -227,6 +244,7 @@ public class BundleContext {
                     .forSessionId("LaunchThread")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
+                    .withCause(e)
                     .alwaysThrow(true)
                     .takeBrief("Bundle launcher error")
                     .addMessage("Open bundle thread to startup bundle -> {0} is error.",

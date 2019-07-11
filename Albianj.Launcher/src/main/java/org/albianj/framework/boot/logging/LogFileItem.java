@@ -31,12 +31,13 @@ public class LogFileItem {
         if (!p.exists()) {
             p.mkdirs();
         }
-        String filename = StringServant.Instance.join(logFolder, logName, "_", DailyServant.Instance.datetimeLongStringWithoutSep(), ".log");
+        String filename = StringServant.Instance.join(logFolder, logName, "-", DailyServant.Instance.datetimeLongStringWithMillisNoSep(), ".log");
         try {
             fos = new FileOutputStream(filename, true);
         } catch (FileNotFoundException e) {
 
         }
+        this.busyB = 0;
     }
 
     public void write(String buffer) {
@@ -46,7 +47,7 @@ public class LogFileItem {
             fos.flush();
             busyB += bytes.length;
             if (busyB >= maxFilesizeB) {
-                fos.close();
+                close();
                 newLogFile(this.logName,this.logFolder);
             }
         } catch (IOException e) {
@@ -56,6 +57,7 @@ public class LogFileItem {
 
     public void close() {
         try {
+            this.busyB = 0;
             fos.flush();
             fos.close();
         } catch (IOException e) {
