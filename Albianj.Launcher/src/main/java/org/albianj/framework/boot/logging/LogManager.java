@@ -1,8 +1,11 @@
 package org.albianj.framework.boot.logging;
 
+import org.albianj.framework.boot.tags.BundleSharingTag;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@BundleSharingTag
 public class LogManager extends Thread {
 
     public static LogManager Instance = null;

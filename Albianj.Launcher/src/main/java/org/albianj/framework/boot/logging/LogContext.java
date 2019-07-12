@@ -1,7 +1,10 @@
 package org.albianj.framework.boot.logging;
 
+import org.albianj.framework.boot.tags.BundleSharingTag;
+
 import java.util.ArrayList;
 
+@BundleSharingTag
 public class LogContext {
     private LogFileItem lfi;
     private ArrayList<LogPacket> aq = new ArrayList();

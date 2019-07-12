@@ -2,6 +2,7 @@ package org.albianj.framework.boot.loader;
 
 import org.albianj.framework.boot.BundleContext;
 import org.albianj.framework.boot.servants.FileServant;
+import org.albianj.framework.boot.servants.RefArg;
 import org.albianj.framework.boot.servants.TypeServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
@@ -11,7 +12,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -40,19 +43,14 @@ public class BundleClassLoader extends ClassLoader {
      * key - full classname
      * value - class file metadata
      */
-//    private Map<String, TypeFileMetadata> clzzFileMetadatasInBin = null;
-//    private Map<String, TypeFileMetadata> clzzFileMetadatasInCls = null;
-//    private Map<String, TypeFileMetadata> clzzFileMetadatasInLib = null;
 
     protected Map<String,TypeFileMetadata> totalFileMetadatas = null;
+    protected Set<String> jarFileSet = null;
 
     protected BundleClassLoader(String bundleName) {
         this.bundleName = bundleName;
-//        clzzFileMetadatasInBin = new HashMap<>();
-//        clzzFileMetadatasInCls = new HashMap<>();
-//        clzzFileMetadatasInLib = new HashMap<>();
-
         totalFileMetadatas = new HashMap<>();
+        jarFileSet = new HashSet<>();
     }
 
     public static BundleClassLoader newInstance(String bundleName) {
@@ -99,18 +97,15 @@ public class BundleClassLoader extends ClassLoader {
     protected Class<?> findClass(String name) throws ClassNotFoundException {
 //         step 1 : find from bin directory
         TypeFileMetadata cfm = totalFileMetadatas.get(name);
-//        // step 2 : if not find from bin directory then find from classes directory
-//        if (cfm == null) {
-//            cfm = clzzFileMetadatasInCls.get(name);
-//        }
-//        // step 3 : if not find from classes directory then find from lib directory
-//        if (cfm == null) {
-//            cfm = clzzFileMetadatasInLib.get(name);
-//        }
 
         if (cfm != null) {
+            if(null != cfm.getType()) {
+                return cfm.getType();
+            }
             byte[] bytes = cfm.getFileContentBytes();
-            return defineClass(name, bytes, 0, bytes.length);
+            Class<?> clzz = defineClass(name, bytes, 0, bytes.length);
+            cfm.setType(clzz);
+            return clzz;
         }
 
         // step 4 : if not find from lib directory then find from app classloader
@@ -133,10 +128,20 @@ public class BundleClassLoader extends ClassLoader {
                 }
             }
 
-            String path = TypeServant.Instance.fileProtoUrl2FileSystemPath(clzz);
-            byte[] data = FileServant.Instance.getFileBytes(path);
-            if (null != data) {
-                return defineClass(name, data, 0, data.length);
+            /**
+             * if use maven,class is in jar file
+             */
+            if(TypeServant.Instance.isClassInJar(clzz)){
+                RefArg<String> jarSimpleName = new RefArg<>();
+                String jarName = TypeServant.Instance.findClassParentJar(clzz,jarSimpleName);
+                scanJarFile(jarName,jarName,totalFileMetadatas);
+                return findClass(name);
+            } else {
+                String path = TypeServant.Instance.fileProtoUrl2FileSystemPath(clzz);
+                byte[] data = FileServant.Instance.getFileBytes(path);
+                if (null != data) {
+                    return defineClass(name, data, 0, data.length);
+                }
             }
         }
         Class<?> c = Class.forName(cfm.getFullClassName()); //when use app container such as jetty then use
@@ -206,10 +211,14 @@ public class BundleClassLoader extends ClassLoader {
     }
 
     public void scanJarFile(String fromFolder,String jarFile, Map<String, TypeFileMetadata> map) {
+        if (jarFileSet.contains(jarFile)) {
+            return;
+        }
         JarInputStream jis = null;
         try {
             jis = new JarInputStream(new FileInputStream(jarFile));
             sacnSingleJarBytes(fromFolder, jarFile, map, jis);
+            jarFileSet.add(jarFile);
         } catch (Exception e) {
 
         } finally {
@@ -231,10 +240,15 @@ public class BundleClassLoader extends ClassLoader {
                     continue;
                 }
                 byte[] bytes = TypeServant.Instance.readJarBytes(jis);
-                Class<?> cla = defineClass(name, bytes, 0, bytes.length);
+                name = name.replace("/",".");
+                String classname = name;
+                if(classname.endsWith(".class")) {
+                    classname = classname.substring(0,classname.lastIndexOf("."));
+                }
                 TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true,fromFolder);
-                cfm.setType(cla);
-                map.put(cfm.getFullClassName(), cfm);
+                map.put(cfm.getFullClassNameWithoutSuffix(), cfm);
+//                Class<?> cla = defineClass(classname, bytes, 0, bytes.length);
+//                cfm.setType(cla);
             }
         }
     }

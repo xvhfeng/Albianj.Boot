@@ -9,8 +9,10 @@ import org.albianj.framework.boot.logging.LogServant;
 import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.logging.LoggerConf;
 import org.albianj.framework.boot.servants.*;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.w3c.dom.Node;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Map;
  * }
  * }</pre>
  */
+@BundleSharingTag
 public class ApplicationContext {
 
     public static ApplicationContext Instance;
@@ -49,7 +52,7 @@ public class ApplicationContext {
     private String workFolder = null;
     private String logsPath = null;
     private boolean isOpenConsole = false;
-    private Map<String, BundleConf> attAttrs = new HashMap<>();
+//    private Map<String, BundleConf> attAttrs = new HashMap<>();
     private Map<String, BundleContext> bundleContextMap = new HashMap<>();
     private Thread currentThread ;
     private boolean isWindows;
@@ -86,17 +89,31 @@ public class ApplicationContext {
         return this;
     }
 
-    public ApplicationContext addBundle(Class<?> refType, String name, String workFolder, Class<?> bundleType, boolean isInstallSpxFile) {
-        if (this.phase != Phase.Prepare) {
-            ThrowableServant.Instance.throwDisplayException(refType, null,
-                    "Application Phase Error",
-                    "App current phase is {0},it allow add the bundle only app is {1}.",
-                    this.phase.getDescription(), Phase.Prepare.getDescription());
+    public ApplicationContext addBundle(Class<?> refType,BundleContext bctx){
+        if(bundleContextMap.containsKey(bctx.getBundleName())) {
+            BundleContext preBctx = bundleContextMap.get(bctx.getBundleName());
+            if(Phase.Run ==  preBctx.getPhase()) {
+               // first not support for hot loading
+
+            }
+
         }
-        BundleConf bundleAttr = new BundleConf(name, workFolder, bundleType.getName(), isInstallSpxFile);
-        attAttrs.put(name, bundleAttr);
+        bundleContextMap.put(bctx.getBundleName(),bctx);
         return this;
     }
+
+
+//    public ApplicationContext addBundle(Class<?> refType, String name, String workFolder, Class<?> bundleType, boolean isInstallSpxFile) {
+//        if (this.phase != Phase.Prepare) {
+//            ThrowableServant.Instance.throwDisplayException(refType, null,
+//                    "Application Phase Error",
+//                    "App current phase is {0},it allow add the bundle only app is {1}.",
+//                    this.phase.getDescription(), Phase.Prepare.getDescription());
+//        }
+//        BundleConf bundleAttr = new BundleConf(name, workFolder, bundleType.getName(), isInstallSpxFile);
+//        attAttrs.put(name, bundleAttr);
+//        return this;
+//    }
 
 //    public ApplicationContext setLogger(ILogger logger) {
 //        this.logger = logger;
@@ -107,31 +124,31 @@ public class ApplicationContext {
 //        return this.logger;
 //    }
 
-    public void attachBundle(Class<?> refType, String name, String workFolder, String bundleTypeName, boolean isInstallSpxFile, String[] args) {
-        if (this.phase != Phase.Run) {
-            ThrowableServant.Instance.throwDisplayException(refType, null,
-                    "Application Phase Error",
-                    "App current phase is {0},it allow attach the bundle only app is {1}..",
-                    this.phase.getDescription(), Phase.Run.getDescription());
-        }
-
-        synchronized (this) {
-            if (isBundleExist(name)) {
-                ThrowableServant.Instance.throwDisplayException(refType, null,
-                        "Repeat startup bundle.",
-                        "Bundle -> {0} was starting.", name);
-            }
-            BundleConf conf = new BundleConf(name, workFolder, bundleTypeName, isInstallSpxFile);
-            attAttrs.put(name, conf);
-            BundleContext bundleCtx = BundleContext.newInstance()
-                    .setBundleName(conf.getName())
-                    .setWorkFolder(conf.getWorkFolder())
-                    .setStartupTypeName(conf.getStartupClassname())
-                    .build(refType.getName());
-            bundleContextMap.put(conf.getName(), bundleCtx);
-            bundleCtx.startup(args);
-        }
-    }
+//    public void attachBundle(Class<?> refType, String name, String workFolder, String bundleTypeName, boolean isInstallSpxFile, String[] args) {
+//        if (this.phase != Phase.Run) {
+//            ThrowableServant.Instance.throwDisplayException(refType, null,
+//                    "Application Phase Error",
+//                    "App current phase is {0},it allow attach the bundle only app is {1}..",
+//                    this.phase.getDescription(), Phase.Run.getDescription());
+//        }
+//
+//        synchronized (this) {
+//            if (isBundleExist(name)) {
+//                ThrowableServant.Instance.throwDisplayException(refType, null,
+//                        "Repeat startup bundle.",
+//                        "Bundle -> {0} was starting.", name);
+//            }
+//            BundleConf conf = new BundleConf(name, workFolder, bundleTypeName, isInstallSpxFile);
+//            attAttrs.put(name, conf);
+//            BundleContext bundleCtx = BundleContext.newInstance()
+//                    .setBundleName(conf.getName())
+//                    .setWorkFolder(conf.getWorkFolder())
+//                    .setStartupClassName(conf.getStartupClassname())
+//                    .build(refType.getName());
+//            bundleContextMap.put(conf.getName(), bundleCtx);
+//            bundleCtx.startup(args);
+//        }
+//    }
 
     public boolean isBundleExist(String bundleName) {
         return bundleContextMap.containsKey(bundleName);
@@ -176,7 +193,7 @@ public class ApplicationContext {
         String bundleName = null;
         bundleName = ((BundleClassLoader) loader).getBundleName();
 
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(bundleName) && isThrowIfBundleNotExist) {
+        if (StringServant.Instance.isNullOrEmptyOrAllSpace(bundleName) && isThrowIfBundleNotExist) {
             LogServant.Instance.newLogPacket()
                     .forSessionId("StartupThread")
                     .atLevel(LoggerLevel.Error)
@@ -195,16 +212,16 @@ public class ApplicationContext {
             this.phase = Phase.PrepareEnd;
             buildApplicationRuntime(args);
             this.phase = Phase.Run;
-            for(int i = 0; i <200000; i++){
-                LogServant.Instance.newLogPacket()
-                        .forSessionId("StartupThread")
-                        .atLevel(LoggerLevel.Info)
-                        .byCalled(this.getClass())
-                        .takeBrief("Albianj Application Startup")
-                        .addMessage("{2} Albianj application startuping by using RuntimeLogger with folder -> {0} and {1} open ConsoleLogger.",
-                                logsPath, isOpenConsole ? "" : "not",i)
-                        .toLogger();
-            }
+//            for(int i = 0; i <200000; i++){
+//                LogServant.Instance.newLogPacket()
+//                        .forSessionId("StartupThread")
+//                        .atLevel(LoggerLevel.Info)
+//                        .byCalled(this.getClass())
+//                        .takeBrief("Albianj Application Startup")
+//                        .addMessage("{2} Albianj application startuping by using RuntimeLogger with folder -> {0} and {1} open ConsoleLogger.",
+//                                logsPath, isOpenConsole ? "" : "not",i)
+//                        .toLogger();
+//            }
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             try {
@@ -286,19 +303,51 @@ public class ApplicationContext {
         /**
          * special deal app org.albianj.framework.test.org.albianj.framework.boot
          */
-        repair("StartupThread", logsPath, attAttrs);
+        repair("StartupThread", logsPath);
 
-        for (Map.Entry<String, BundleConf> entry : attAttrs.entrySet()) {
-            BundleConf conf = entry.getValue();
-            BundleContext bundleCtx = BundleContext.newInstance()
-                    .setBundleName(conf.getName())
-                    .setWorkFolder(conf.getWorkFolder())
-                    .setStartupTypeName(conf.getStartupClassname())
-                    .build("StartupThread");
-            bundleContextMap.put(conf.getName(), bundleCtx);
-            bundleCtx.startup(args);
+        //the last add bundle from conf,it will be control from conf-file
+        Map<String, BundleConf> confBundlesAttr = appConf.getBundlesConf();
+        if (!CollectServant.Instance.isNullOrEmpty(confBundlesAttr)) {
+            for(BundleConf entry : confBundlesAttr.values()) {
+                BundleContext bctx = BundleContext.newInstance()
+                        .setBundleName(entry.getName())
+                        .setInstallSpxFile(entry.isInstallSpxFile())
+                        .setStartupClassName(entry.getStartupClassname())
+                        .setWorkFolder(entry.getWorkFolder())
+                        .setArgs(args);
+                addBundle(this.getClass(),bctx);
+            }
         }
+
+        startupBundle();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    startupBundle();
+                    try {
+                        Thread.sleep(2000);
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+        },"BundleStartupDeamonThead");
+        thread.setDaemon(true);
+        thread.start();
         return true;
+    }
+
+    private void startupBundle() {
+        if(!CollectServant.Instance.isNullOrEmpty(bundleContextMap)) {
+            for (Map.Entry<String, BundleContext> entry : bundleContextMap.entrySet()) {
+                BundleContext bctx = entry.getValue();
+                if (Phase.PrepareEnd == bctx.getPhase()) {
+                    bctx.startup(bctx.getArgs());
+                }
+            }
+        }
     }
 
     public void exitSystem(int st) {
@@ -318,7 +367,7 @@ public class ApplicationContext {
     }
 
     private String findConfigFile(String workFolder, String simpleFileName) {
-        return workFolder + "conf" + File.separator + simpleFileName;
+        return workFolder + "config" + File.separator + simpleFileName;
     }
 
     private AppConf parserAppBundleConf(XmlParserContext xmlParserCtx, String logsPath) {
@@ -402,38 +451,11 @@ public class ApplicationContext {
         return bundleAttr;
     }
 
-    private void repair(String sessionId, String logsPath, Map<String, BundleConf> attAttrs) {
+    private void repair(String sessionId, String logsPath) {
         XmlParserContext confCtx = loadAppConf(sessionId, this.workFolder);
         appConf = parserAppBundleConf(confCtx, logsPath);
         LoggerConf logAttr = appConf.getRootLoggerAttr();
         LogServant.Instance.repair(logAttr);
-        Map<String, BundleConf> confBundlesAttr = appConf.getBundlesConf();
-        if (CollectServant.Instance.isNullOrEmpty(confBundlesAttr)) {
-            attAttrs.putAll(confBundlesAttr);
-        }
-    }
-
-    public enum Phase {
-        Prepare(10, "[Code:10,Tag:PrepareForRuning]"),
-        PrepareEnd(20, "[Code:20,Tag:PrepareEndThenWaitRunning]"),
-        Run(30, "[Code:30,Tag:Running]"),
-        RunEnd(40, "[Code:40,Tag:RunningStop]");
-
-        private int st;
-        private String desc;
-
-        Phase(int st, String desc) {
-            this.st = st;
-            this.desc = desc;
-        }
-
-        public int getPhaseCode() {
-            return this.st;
-        }
-
-        public String getDescription() {
-            return this.desc;
-        }
     }
 
 }

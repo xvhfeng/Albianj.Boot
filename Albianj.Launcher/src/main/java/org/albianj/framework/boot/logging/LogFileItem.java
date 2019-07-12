@@ -3,12 +3,14 @@ package org.albianj.framework.boot.logging;
 import org.albianj.framework.boot.servants.ConvertServant;
 import org.albianj.framework.boot.servants.DailyServant;
 import org.albianj.framework.boot.servants.StringServant;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+@BundleSharingTag
 public class LogFileItem {
     private String logName;
     private String logFolder;

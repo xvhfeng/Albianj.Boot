@@ -43,6 +43,7 @@ import org.albianj.framework.boot.servants.ConvertServant;
 import org.albianj.framework.boot.servants.FileServant;
 import org.albianj.framework.boot.logging.LogServant;
 import org.albianj.framework.boot.logging.LoggerLevel;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -54,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarInputStream;
 
-
+@BundleSharingTag
 public class AlbianClassLoader extends BundleClassLoader {
 
     private Map<String, TypeFileMetadata> mapTypesInSpxLib;

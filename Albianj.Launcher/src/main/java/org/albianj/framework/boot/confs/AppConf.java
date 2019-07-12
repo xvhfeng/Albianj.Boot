@@ -2,9 +2,10 @@ package org.albianj.framework.boot.confs;
 
 
 import org.albianj.framework.boot.logging.LoggerConf;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.util.Map;
-
+@BundleSharingTag
 public class AppConf {
     private String appName = "AlbianDefaultApp";
     private String machineId;

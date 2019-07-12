@@ -19,7 +19,7 @@ public class BundleContext {
     private String bundleName;
     private ClassLoader classLoader;
     private ThreadGroup threadGroup;
-    private String startupType;
+    private String  startupClassname;
 
     private IBundleListener beginStartupEvent;
     private IBundleListener beginRunEvent;
@@ -31,6 +31,8 @@ public class BundleContext {
     private String libFolder;
     private String confFolder;
     private String appsFolder;
+    private Phase phase;
+    private String[] args;
 
     public BundleContext setBundleName(String name){
         this.bundleName = name;
@@ -42,8 +44,8 @@ public class BundleContext {
         return this;
     }
 
-    public BundleContext setStartupTypeName(String  typeName){
-        this.startupType = typeName;
+    public BundleContext setStartupClassName(String  startupClassname){
+        this.startupClassname = startupClassname;
         return this;
     }
 
@@ -97,7 +99,7 @@ public class BundleContext {
         return this;
     }
 
-    public BundleContext build(String sessionId){
+    public BundleContext build(){
         if(null == this.classLoader) {
             BundleClassLoader classLoader = isInstallSpxFile
                     ?  AlbianClassLoader.newInstance(bundleName)
@@ -113,20 +115,13 @@ public class BundleContext {
         threadGroup = new ThreadGroup(bundleName);
         threadGroup.setDaemon(true);
 
-        LogServant.Instance.newLogPacket()
-                .forSessionId(sessionId)
-                .atLevel(LoggerLevel.Info)
-                .byCalled(this.getClass())
-                .takeBrief("Bundle Runtime Settings")
-                .addMessage("Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
-                        this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder)
-                .toLogger();
 
+        this.phase = Phase.PrepareEnd;
         return this;
     }
 
     protected BundleContext() {
-
+        this.phase = Phase.Prepare;
     }
 
     public static BundleContext newInstance() {
@@ -158,7 +153,7 @@ public class BundleContext {
 
     public String getConfFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.confFolder)
-                ? workPath + "conf" + File.pathSeparator : this.confFolder;
+                ? workPath + "config" + File.pathSeparator : this.confFolder;
     }
 
     public String getAppsFolder() {
@@ -170,8 +165,8 @@ public class BundleContext {
         return this.bundleName;
     }
 
-    public String getStartupType(){
-        return this.startupType;
+    public String getStartupClassName(){
+        return this.startupClassname;
     }
 
     public ThreadGroup getThreadGroup(){
@@ -186,22 +181,51 @@ public class BundleContext {
         return this.getConfFolder() + simpleFileName;
     }
 
+    public Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(Phase phase) {
+        this.phase = phase;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public BundleContext setArgs(String[] args) {
+        this.args = args;
+        return this;
+    }
+
     public void startup(final String[] args){
+        LogServant.Instance.newLogPacket()
+                .forSessionId("StartThread")
+                .atLevel(LoggerLevel.Info)
+                .byCalled(this.getClass())
+                .takeBrief("Bundle Runtime Settings")
+                .addMessage("Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
+                        this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder)
+                .toLogger();
+
+
+        this.phase = Phase.Run;
         if(null != this.beginStartupEvent) {
             this.beginRunEvent.onActionExecute(this);
         }
         BundleThread thread = null;
+        final BundleContext bctx = this;
         try {
             thread = newThread(this.bundleName, new Runnable() {
                 @Override
                 public void run() {
-                    BundleContext ctx = ApplicationContext.Instance.findBundleContext(bundleName, true);
-                    String startupTypeName = ctx.getStartupType();
+//                    BundleContext ctx = ApplicationContext.Instance.findBundleContext(bundleName, true);
+                    String startupTypeName = bctx.getStartupClassName();
                     try {
-                        Class<?> clzz = ctx.getClassLoader().loadClass(startupTypeName);
+                        Class<?> clzz = bctx.getClassLoader().loadClass(startupTypeName);
                         Object launcher =  clzz.newInstance();
                         Method startup = null;
-                        startup = clzz.getMethod("startup",String[].class);
+                        startup = clzz.getMethod("startup");
                         if(null == startup){
                             LogServant.Instance.newLogPacket()
                                     .forSessionId("LaunchThread")
@@ -214,9 +238,9 @@ public class BundleContext {
                                     .toLogger();
                         }
                         if(null != beginRunEvent) {
-                            beginRunEvent.onActionExecute(ctx);
+                            beginRunEvent.onActionExecute(bctx);
                         }
-                        startup.invoke(launcher,args);
+                        startup.invoke(launcher);
                         LogServant.Instance.newLogPacket()
                                 .forSessionId("LaunchThread")
                                 .atLevel(LoggerLevel.Info)

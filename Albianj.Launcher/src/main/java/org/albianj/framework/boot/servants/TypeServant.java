@@ -87,7 +87,7 @@ public class TypeServant {
         String path = null;
         if(url.startsWith("jar:")) {
             int jarSepIdx = url.lastIndexOf("!");
-            path = url.substring(9,jarSepIdx);//jar proto must with file proto
+            path = url.substring(10,jarSepIdx);//jar proto must with file proto
             path = path.substring(0, path.lastIndexOf("/",path.lastIndexOf(".")-1));
             return path.replace("/",File.separator);
         }
@@ -99,6 +99,36 @@ public class TypeServant {
         return path.replace("/",File.separator);
     }
 
+    public String clzz2FileSystemPath(Class<?> clzz){
+        String path = clzz.getResource("").toString();
+        if(path.startsWith("jar:")){ //use maven protocol
+            return classResourcePathToFileSystemWorkFolder(clzz);
+        }
+            return fileProtoUrl2FileSystemPath(clzz);
+    }
+
+    public boolean isClassInJar(Class<?> clzz){
+        String path = clzz.getResource("").toString();
+        return path.startsWith("jar:");
+    }
+
+    /**
+     * 找到class所在jar的jar文件路径（全路径，包括jar名）
+     * ref参数返回jar的名称，不带路径
+     * @param clzz
+     * @param jarSimpleName
+     * @return
+     */
+    public String findClassParentJar(Class<?> clzz,RefArg<String> jarSimpleName){
+        String url = clzz.getResource("").toString();
+        String path = null;
+        if(url.startsWith("jar:")) {
+            int jarSepIdx = url.lastIndexOf("!");
+            path = url.substring(10,jarSepIdx);//jar proto must with file proto
+            jarSimpleName.setValue(path.substring(path.lastIndexOf("/",path.lastIndexOf(".")+1)));
+        }
+        return path.replace("/",File.separator);
+    }
     /**
      * file协议的路径转换成文件系统的路径
      * @return

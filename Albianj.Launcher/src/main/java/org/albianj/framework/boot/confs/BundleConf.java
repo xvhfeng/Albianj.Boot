@@ -1,5 +1,8 @@
 package org.albianj.framework.boot.confs;
 
+import org.albianj.framework.boot.tags.BundleSharingTag;
+
+@BundleSharingTag
 public class BundleConf {
     private String name;
     private String workFolder;

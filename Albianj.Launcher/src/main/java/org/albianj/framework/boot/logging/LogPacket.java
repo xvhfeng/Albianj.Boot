@@ -7,6 +7,7 @@ import org.albianj.framework.boot.except.HiddenException;
 import org.albianj.framework.boot.except.ThrowableServant;
 import org.albianj.framework.boot.servants.DailyServant;
 import org.albianj.framework.boot.servants.StringServant;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 /**
  * 日志的数据结构
@@ -23,6 +24,7 @@ import org.albianj.framework.boot.servants.StringServant;
  * .toLogger("loggerName");
  * </code>
  */
+@BundleSharingTag
 public class LogPacket {
     private long datetimeMS;
     private LoggerLevel level;
@@ -164,35 +166,26 @@ public class LogPacket {
         return level;
     }
 
-    public String toString(){StringBuilder sb = new StringBuilder();
-        sb.append(DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS)).append(" ").append(level.getTag())
-                .append(" Session:").append(sessionId);
+    public String toString(){
+        String bName = "Application";
         if(StringServant.Instance.isNullOrEmptyOrAllSpace(bundleName)) {
             BundleContext ctx =  ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
-            if(null == ctx){
-                sb.append(" Bundle:Application");
-            } else {
-                sb.append(" Bundle:").append(ctx.getBundleName());
+            if(null != ctx){
+                bName = ctx.getBundleName();
             }
         } else {
-            sb.append(" Bundle:").append(bundleName);
-        }
-        sb.append(" Thread:").append(Thread.currentThread().getId())
-                .append(" Brief:").append(brief);
-
-        if(StringServant.Instance.isNotNullOrEmptyOrAllSpace(secretMsg)) {
-            sb.append(" Secert:").append(secretMsg);
+            bName = bundleName;
         }
 
-        sb.append(" Message:").append(logMsg);
+        String msg = StringServant.Instance.format(
+                "{0} [{1}] Session:[{2}] Bundle:[{3}] Thread:[{4}] Brief:[{5}] Secret:[{6}] Msg:[{7}] [{8}]. {9}",
+                DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
+                level.getTag(),sessionId,bName,Thread.currentThread().getId(),
+                brief,StringServant.Instance.isNullOrEmpty(secretMsg) ? "NULL" : secretMsg,logMsg,
+                ThrowableServant.Instance.buildThrowBuffer(cause,refType),
+                System.lineSeparator());
 
-        if(null != cause) {
-            StringBuilder buff = ThrowableServant.Instance.buildThrowBuffer(cause,refType);
-            sb.append(buff);
-        }
-        sb.append(System.lineSeparator());
-
-        return sb.toString();
+        return msg;
     }
 
 }

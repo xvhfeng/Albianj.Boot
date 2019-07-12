@@ -3,10 +3,12 @@ package org.albianj.framework.boot;
 
 import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.logging.LogServant;
+import org.albianj.framework.boot.tags.BundleSharingTag;
 
 /**
  * bundle执行的thread
  */
+@BundleSharingTag
 public class BundleThread extends Thread {
 
     private BundleContext bundleContext;
