@@ -69,7 +69,7 @@ public class StringServant {
     public boolean isNullOrEmpty(String value) {
         return null == value || value.isEmpty();
     }
-    public boolean isNotNullOrEmpty(String value) {
+    public boolean isNotNullAndNotEmpty(String value) {
         return !(null == value || value.isEmpty());
     }
 
@@ -77,7 +77,7 @@ public class StringServant {
         return null == value || value.trim().isEmpty();
     }
 
-    public boolean isNotNullOrEmptyOrAllSpace(String value) {
+    public boolean isNotNullAndNotEmptyAndNotAllSpace(String value) {
         return !(null == value || value.trim().isEmpty());
     }
 

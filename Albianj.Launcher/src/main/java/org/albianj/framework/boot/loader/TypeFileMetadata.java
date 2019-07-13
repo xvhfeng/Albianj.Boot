@@ -67,12 +67,12 @@ public class TypeFileMetadata {
         cfm.setParentFileName(parentFileName);
         if (fullFileName.endsWith(".class")) {
             cfm.setFullFileName(fullFileName);
-            String ffn = fullFileName.replace(File.separator, ".");
+            String ffn = fullFileName.replace("/\\", ".");
             cfm.setFullClassName(ffn);
             cfm.setFullClassNameWithoutSuffix(ffn.substring(0, fullFileName.lastIndexOf(".class")));
         } else {
             cfm.setFullFileName(fullFileName.concat(".class"));
-            String ffn = fullFileName.replace(File.separator, ".");
+            String ffn = fullFileName.replace("\\/", ".");
             cfm.setFullClassName(ffn.concat(".class"));
             cfm.setFullClassNameWithoutSuffix(ffn);
         }
@@ -169,5 +169,9 @@ public class TypeFileMetadata {
 
     public void setFromFolder(String from) {
         this.fromFolder = from;
+    }
+
+    public String mkKey(){
+        return this.fullClassNameWithoutSuffix;
     }
 }

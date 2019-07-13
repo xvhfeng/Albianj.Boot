@@ -20,6 +20,7 @@ public class LogManager extends Thread {
     private Map<String, LogContext> logs = null;
     private Map<String, LoggerConf> logsConf = null;
     protected LogManager() {
+
         logs = new HashMap<>();
         logsConf = new HashMap<>();
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

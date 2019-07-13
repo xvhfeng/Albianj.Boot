@@ -199,14 +199,14 @@ public class BundleContext {
     }
 
     public void startup(final String[] args){
-        LogServant.Instance.newLogPacket()
+        LogServant.Instance.newLogPacketBuilder()
                 .forSessionId("StartThread")
                 .atLevel(LoggerLevel.Info)
                 .byCalled(this.getClass())
                 .takeBrief("Bundle Runtime Settings")
                 .addMessage("Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
                         this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder)
-                .toLogger();
+                .build().toLogger();
 
 
         this.phase = Phase.Run;
@@ -227,7 +227,7 @@ public class BundleContext {
                         Method startup = null;
                         startup = clzz.getMethod("startup");
                         if(null == startup){
-                            LogServant.Instance.newLogPacket()
+                            LogServant.Instance.newLogPacketBuilder()
                                     .forSessionId("LaunchThread")
                                     .atLevel(LoggerLevel.Error)
                                     .byCalled(this.getClass())
@@ -235,22 +235,22 @@ public class BundleContext {
                                     .takeBrief("Bundle launcher Error")
                                     .addMessage("Bundle -> {0} startup by Class -> {1},but it without method startup(string[] args).Make sure the method is exist",
                                             bundleName, startupTypeName)
-                                    .toLogger();
+                                    .build().toLogger();
                         }
                         if(null != beginRunEvent) {
                             beginRunEvent.onActionExecute(bctx);
                         }
                         startup.invoke(launcher);
-                        LogServant.Instance.newLogPacket()
+                        LogServant.Instance.newLogPacketBuilder()
                                 .forSessionId("LaunchThread")
                                 .atLevel(LoggerLevel.Info)
                                 .byCalled(this.getClass())
                                 .takeBrief("Bundle launcher")
                                 .addMessage("Startup bundle -> {0} with class -> {1} success.",
                                         bundleName, startupTypeName)
-                                .toLogger();
+                                .build().toLogger();
                     } catch (Exception e) {
-                        LogServant.Instance.newLogPacket()
+                        LogServant.Instance.newLogPacketBuilder()
                                 .forSessionId("LaunchThread")
                                 .atLevel(LoggerLevel.Error)
                                 .byCalled(this.getClass())
@@ -259,12 +259,12 @@ public class BundleContext {
                                 .takeBrief("Bundle launcher error")
                                 .addMessage("Startup bundle -> {0} with class -> {1} is error.",
                                         bundleName, startupTypeName)
-                                .toLogger();
+                                .build().toLogger();
                     }
                 }
             });
         }catch (Exception e){
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LaunchThread")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -273,17 +273,17 @@ public class BundleContext {
                     .takeBrief("Bundle launcher error")
                     .addMessage("Open bundle thread to startup bundle -> {0} is error.",
                             bundleName)
-                    .toLogger();
+                    .build().toLogger();
             return;
         }
         if(null != thread) {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LaunchThread")
                     .atLevel(LoggerLevel.Info)
                     .byCalled(this.getClass())
                     .takeBrief("Bundle launcher")
                     .addMessage("Startup thread of bundle -> {0}....", bundleName)
-                    .toLogger();
+                    .build().toLogger();
             thread.start();
         }
     }

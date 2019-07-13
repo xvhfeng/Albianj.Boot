@@ -95,7 +95,9 @@ public class BundleClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-//         step 1 : find from bin directory
+        /**
+         * find from jar or classes folder
+         */
         TypeFileMetadata cfm = totalFileMetadatas.get(name);
 
         if (cfm != null) {
@@ -108,8 +110,9 @@ public class BundleClassLoader extends ClassLoader {
             return clzz;
         }
 
-        // step 4 : if not find from lib directory then find from app classloader
-        // this step for developer use IDE
+        /**
+         *  if not find from lib directory then find from system classloader
+         */
         ClassLoader appLoader = ClassLoader.getSystemClassLoader(); // app loader
         Class<?> clzz = appLoader.loadClass(name);
         if (clzz != null) { //reload class by custom loader
@@ -117,7 +120,10 @@ public class BundleClassLoader extends ClassLoader {
                 return clzz;
             }
 
-            //interface is not transmit annotation,so only try one by one
+            /**
+             *  interface is not transmit annotation,
+             *  so we check everyone and try one by one
+             */
             Class<?>[] itfs = clzz.getInterfaces();
             if (null != itfs) {
                 for (Class<?> itf : itfs) {
@@ -129,14 +135,23 @@ public class BundleClassLoader extends ClassLoader {
             }
 
             /**
-             * if use maven,class is in jar file
+             *  privately-owned class
+             *  so we relaod it by bundle classloader in bundle range
              */
             if(TypeServant.Instance.isClassInJar(clzz)){
+                /**
+                 * class in jar then use jar protocol
+                 * if use maven,jarfile in the .m2 repository
+                 * or maybe referenced in IDE in classpath(we not try it).
+                 */
                 RefArg<String> jarSimpleName = new RefArg<>();
                 String jarName = TypeServant.Instance.findClassParentJar(clzz,jarSimpleName);
                 scanJarFile(jarName,jarName,totalFileMetadatas);
                 return findClass(name);
             } else {
+                /**
+                 * class in filesystem then use file protocol
+                 */
                 String path = TypeServant.Instance.fileProtoUrl2FileSystemPath(clzz);
                 byte[] data = FileServant.Instance.getFileBytes(path);
                 if (null != data) {
@@ -144,6 +159,10 @@ public class BundleClassLoader extends ClassLoader {
                 }
             }
         }
+
+        /**
+         *  try with third classloader at last time in possible
+         */
         Class<?> c = Class.forName(cfm.getFullClassName()); //when use app container such as jetty then use
         if (null != c) {
             return c;
@@ -174,6 +193,12 @@ public class BundleClassLoader extends ClassLoader {
                         continue;
                     }
                     byte[] bytes = FileServant.Instance.getFileBytes(relFileName);
+                    /**
+                     * scan file not like jarfile so it can define class in the method
+                     * scan a folder for classes just only happend at begin and use classes folde,
+                     * it never use for scan all classes not loaded by app classloader
+                     *
+                     */
                     Class<?> cla = defineClass(f.getAbsolutePath(), bytes, 0, bytes.length);
                     TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
                     cfm.setType(cla);
@@ -241,14 +266,12 @@ public class BundleClassLoader extends ClassLoader {
                 }
                 byte[] bytes = TypeServant.Instance.readJarBytes(jis);
                 name = name.replace("/",".");
-                String classname = name;
-                if(classname.endsWith(".class")) {
-                    classname = classname.substring(0,classname.lastIndexOf("."));
-                }
+//                String classname = name;
+//                if(classname.endsWith(".class")) {
+//                    classname = classname.substring(0,classname.lastIndexOf("."));
+//                }
                 TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true,fromFolder);
-                map.put(cfm.getFullClassNameWithoutSuffix(), cfm);
-//                Class<?> cla = defineClass(classname, bytes, 0, bytes.length);
-//                cfm.setType(cla);
+                map.put(cfm.mkKey(), cfm);
             }
         }
     }
@@ -345,9 +368,9 @@ public class BundleClassLoader extends ClassLoader {
                     && ((null == parent) ? true :  tfm.getType().isAssignableFrom(parent))
                     && ((null == markAnno) ? true : clzz.isAnnotationPresent(markAnno))
                     && ((null == unmarkAnno) ? true :  !clzz.isAnnotationPresent(unmarkAnno))
-                    && (!to.containsKey(tfm.getFullClassNameWithoutSuffix()));
+                    && (!to.containsKey(tfm.mkKey()));
             if(isConform){
-                to.put(tfm.getFullClassNameWithoutSuffix(), tfm);
+                to.put(tfm.mkKey(), tfm);
             }
         }
     }

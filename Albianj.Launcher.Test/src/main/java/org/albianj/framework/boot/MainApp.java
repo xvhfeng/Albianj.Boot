@@ -15,7 +15,7 @@ public class MainApp {
 //                .forSessionId("sessionId")
 //                .atLevel(LoggerLevel.Info)
 //                .byCalled(MainApp.class)
-//                .inBundle("Application")
+//                .aroundBundle("Application")
 //                .keepSecret("secret message")
 //                .alwaysThrow(true)
 //                .takeBrief("Main class Info")

@@ -38,17 +38,17 @@ public class BundleThread extends Thread {
         try {
             super.run();
         }catch (Throwable e){
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("BundleThread")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
-                    .inBundle(bundleContext.getBundleName())
+                    .aroundBundle(bundleContext.getBundleName())
                     .withCause(e)
                     .alwaysThrow(true)
                     .takeBrief("BundleThread executer error")
                     .addMessage("execute bundle -> {0} thread  is error,then exit thread...",
                             bundleContext.getBundleName())
-                    .toLogger();
+                    .build().toLogger();
 
         }finally {
             return;

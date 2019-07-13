@@ -1,5 +1,6 @@
 package org.albianj.framework.boot.logging;
 
+import org.albianj.framework.boot.except.ThrowableServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class LogContext {
             }
         }
 
+        if(isStopAccept && !cq.isEmpty()) {
+            q.addAll(cq);
+        }
+
         if (q.isEmpty()) {
             return;
         }
@@ -55,10 +60,14 @@ public class LogContext {
         }
 
         for (LogPacket p : q) {
-            String buf = p.toString();
-            lfi.write(buf);
-            if (logConf.isOpenConsole()) {
-                System.out.print(buf);
+            try {
+                String buf = p.toString();
+                lfi.write(buf);
+                if (logConf.isOpenConsole()) {
+                    System.out.print(buf);
+                }
+            }catch (Throwable t){
+                System.out.println("Flush to logger file fail." + ThrowableServant.Instance.printThrowStackTrace(t));
             }
         }
         q.clear();

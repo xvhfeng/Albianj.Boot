@@ -36,6 +36,7 @@ public class LogPacket {
     private String logMsg;
     private String sessionId;
     private String bundleName;
+    private Thread refThread;
 
     public LogPacket(){
         this.datetimeMS = System.currentTimeMillis();
@@ -46,9 +47,8 @@ public class LogPacket {
      * @param sessionId
      * @return
      */
-    public LogPacket forSessionId(String sessionId){
+    public void setSessionId(String sessionId){
         this.sessionId = sessionId;
-        return this;
     }
 
     /**
@@ -56,9 +56,8 @@ public class LogPacket {
      * @param level
      * @return
      */
-    public LogPacket atLevel(LoggerLevel level){
+    public void setLevel(LoggerLevel level){
         this.level = level;
-        return this;
     }
 
     /**
@@ -66,9 +65,8 @@ public class LogPacket {
      * @param refType
      * @return
      */
-    public LogPacket byCalled(Class<?> refType){
+    public void setCalled(Class<?> refType){
         this.refType = refType;
-        return this;
     }
 
     /**
@@ -76,9 +74,8 @@ public class LogPacket {
      * @param bundleName
      * @return
      */
-    public LogPacket inBundle(String bundleName){
+    public void setBundle(String bundleName){
         this.bundleName = bundleName;
-        return this;
     }
 
     /**
@@ -86,9 +83,8 @@ public class LogPacket {
      * @param cause
      * @return
      */
-    public LogPacket withCause(Throwable cause){
+    public void setCause(Throwable cause){
         this.cause = cause;
-        return this;
     }
 
     /**
@@ -97,9 +93,8 @@ public class LogPacket {
      * @param isThrow
      * @return
      */
-    public LogPacket alwaysThrow(boolean isThrow){
+    public void setThrow(boolean isThrow){
         this.isThrow = isThrow;
-        return this;
     }
 
     /**
@@ -107,31 +102,28 @@ public class LogPacket {
      * @param brief
      * @return
      */
-    public LogPacket takeBrief(String brief){
+    public void setBrief(String brief){
         this.brief = brief;
-        return this;
     }
 
     /**
      * 具有保密信息的日志内容
-     * @param fmt
-     * @param vals
      * @return
      */
-    public LogPacket keepSecret(String fmt, Object... vals){
-        this.secretMsg = StringServant.Instance.format(fmt,vals);
-        return this;
+    public void setSecret(String msg){
+        this.secretMsg = msg;
     }
 
     /**
      * 日志的内容
-     * @param fmt
-     * @param vals
      * @return
      */
-    public LogPacket addMessage(String fmt, Object... vals){
-        this.logMsg = StringServant.Instance.format(fmt,vals);
-        return this;
+    public void setMsg(String msg){
+        this.logMsg = msg;
+    }
+
+    public void setRefThread(Thread refThread){
+        this.refThread = refThread;
     }
 
     /**
@@ -149,7 +141,7 @@ public class LogPacket {
             throw (DisplayException) cause;
         }
 
-        if(!StringServant.Instance.isNullOrEmptyOrAllSpace(secretMsg)){
+        if(StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(secretMsg)){
             ThrowableServant.Instance.throwHiddenException(refType,cause,secretMsg, brief, logMsg);
         }
         ThrowableServant.Instance.throwDisplayException(refType,cause, brief, logMsg);
@@ -166,23 +158,20 @@ public class LogPacket {
         return level;
     }
 
-    public String toString(){
-        String bName = "Application";
-        if(StringServant.Instance.isNullOrEmptyOrAllSpace(bundleName)) {
-            BundleContext ctx =  ApplicationContext.Instance.findCurrentBundleContext(this.getClass(),false);
-            if(null != ctx){
-                bName = ctx.getBundleName();
-            }
-        } else {
-            bName = bundleName;
-        }
+    public Thread getRefThread(){
+        return this.refThread;
+    }
 
+    public String toString(){
+
+        Thread rt = null == this.refThread ? Thread.currentThread() : this.refThread;
         String msg = StringServant.Instance.format(
-                "{0} [{1}] Session:[{2}] Bundle:[{3}] Thread:[{4}] Brief:[{5}] Secret:[{6}] Msg:[{7}] [{8}]. {9}",
+                "{0} [{1}] Session:[{2}] Bundle:[{3}] Thread:[{4},{5}] Brief:[{6}] Secret:[{7}] Msg:[{8}] {9}. {10}",
                 DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
-                level.getTag(),sessionId,bName,Thread.currentThread().getId(),
-                brief,StringServant.Instance.isNullOrEmpty(secretMsg) ? "NULL" : secretMsg,logMsg,
-                ThrowableServant.Instance.buildThrowBuffer(cause,refType),
+                level.getTag(),sessionId,bundleName,
+                rt.getId(),rt.getName(),
+                brief,secretMsg,logMsg,
+                ThrowableServant.Instance.throw2Buffer(cause,refType),
                 System.lineSeparator());
 
         return msg;

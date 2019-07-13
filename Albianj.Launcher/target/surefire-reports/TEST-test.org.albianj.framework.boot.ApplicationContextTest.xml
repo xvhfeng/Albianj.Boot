@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.005" errors="0" skipped="0" tests="24" name="test.org.albianj.framework.boot.ApplicationContextTest">
+<testsuite failures="0" time="0.012" errors="0" skipped="0" tests="24" name="test.org.albianj.framework.boot.ApplicationContextTest">
   <properties>
     <property name="idea.version" value="2018.2.4"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -62,28 +62,28 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase time="0.003" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindBundleContext"/>
+  <testcase time="0.004" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindBundleContext"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testLoadAppConf"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testAttachBundle"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindConfigFile"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetAppStartupType"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testRun"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindRootBundleThread"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindRootBundleThread"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfXmlParserCtx"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfForXmlParserCtxBundleNode"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfForXmlParserCtxBundleNode"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserAppRuntimeLoggerConf"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindLogger"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testExitSystem"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetRuntimeLogger"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testBuildApplicationRuntime"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testAddBundle"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsBundleExist"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testAddBundle"/>
+  <testcase time="0.002" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsBundleExist"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindCurrentBundleContext"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetPhaseCode"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetDescription"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetDescription"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserAppBundleConf"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetLogger"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetWorkFolder"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsWindows"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetLogger"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetWorkFolder"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsWindows"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testRepair"/>
 </testsuite>

@@ -85,7 +85,7 @@ public class AlbianClassLoader extends BundleClassLoader {
         }
 
         if (null == files) { // check isNull for find in lib folder
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LoadSpxLib")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -93,11 +93,11 @@ public class AlbianClassLoader extends BundleClassLoader {
                     .takeBrief("Found SpxLib Fail")
                     .addMessage("Not Found albian.spx file in bin or lib folder at work folder {0},but the file must exist.please check it.",
                             bctx.getWorkFolder())
-                    .toLogger();
+                    .build().toLogger();
         }
 
         if (2 >= files.size()) { // check isNull for find in lib folder
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LoadSpxLib")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -105,18 +105,18 @@ public class AlbianClassLoader extends BundleClassLoader {
                     .takeBrief("Found SpxLib Fail")
                     .addMessage("Found {0} albian.spx file in bin or lib folder at work folder {1}.The file must be single.",
                             files.size(), bctx.getWorkFolder())
-                    .toLogger();
+                    .build().toLogger();
         }
 
         File spxFile = files.get(0);
 
-        LogServant.Instance.newLogPacket()
+        LogServant.Instance.newLogPacketBuilder()
                 .forSessionId("LoadSpxLib")
                 .atLevel(LoggerLevel.Mark)
                 .byCalled(this.getClass())
                 .takeBrief("Load SpxFile")
                 .addMessage("Load Albian spxFile -> {0}.", spxFile.getName())
-                .toLogger();
+                .build().toLogger();
 
         return spxFile;
     }
@@ -133,7 +133,7 @@ public class AlbianClassLoader extends BundleClassLoader {
             fis.read(bVersion);
             String sFVersion = bVersion.toString();
             if (!sFVersion.equalsIgnoreCase(sVersion)) {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("LoadSpxLib")
                         .atLevel(LoggerLevel.Error)
                         .byCalled(this.getClass())
@@ -141,12 +141,12 @@ public class AlbianClassLoader extends BundleClassLoader {
                         .takeBrief("SpxLib Version Fail")
                         .addMessage("albian.spx version is not same.file version -> {0} and packing version -> {1}.",
                                 sVersion,bVersion)
-                        .toLogger();
+                        .build().toLogger();
                 return false;
             }
             return true;
         } catch (IOException e) {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LoadSpxLib")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -155,21 +155,21 @@ public class AlbianClassLoader extends BundleClassLoader {
                     .takeBrief("SpxLib Version Fail")
                     .addMessage("Open and read Albian.spx -> {0} is fail.",
                             fname)
-                    .toLogger();
+                    .build().toLogger();
             return false;
         } finally {
             if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    LogServant.Instance.newLogPacket()
+                    LogServant.Instance.newLogPacketBuilder()
                             .forSessionId("LoadSpxLib")
                             .atLevel(LoggerLevel.Warn)
                             .byCalled(this.getClass())
                             .takeBrief("SpxLib Version Fail")
                             .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
                                     fname)
-                            .toLogger();
+                            .build().toLogger();
                 }
             }
         }
@@ -184,7 +184,7 @@ public class AlbianClassLoader extends BundleClassLoader {
 
             ArrayList<byte[]> list = parserSpxFileToBytes(fis);
             if (CollectServant.Instance.isNullOrEmpty(list)) {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("LoadSpxLib")
                         .atLevel(LoggerLevel.Error)
                         .byCalled(this.getClass())
@@ -192,14 +192,14 @@ public class AlbianClassLoader extends BundleClassLoader {
                         .takeBrief("Parser SpxLib Error")
                         .addMessage("Parser Albian.spx -> {0} to bytes array is null or empty,maybe spx-file format is error or not accord with Albian.Loading .",
                                 fname)
-                        .toLogger();
+                        .build().toLogger();
             }
             for (byte[] bs : list) {
                 scanSingleJarInSpxLib(fname, "", bs, map);
             }
 
         } catch (IOException e) {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LoadSpxLib")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -208,13 +208,13 @@ public class AlbianClassLoader extends BundleClassLoader {
                     .takeBrief("Parser SpxLib Error")
                     .addMessage("Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
                             fname)
-                    .toLogger();
+                    .build().toLogger();
         } finally {
             if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    LogServant.Instance.newLogPacket()
+                    LogServant.Instance.newLogPacketBuilder()
                             .forSessionId("LoadSpxLib")
                             .atLevel(LoggerLevel.Warn)
                             .byCalled(this.getClass())
@@ -222,7 +222,7 @@ public class AlbianClassLoader extends BundleClassLoader {
                             .takeBrief("Parser SpxLib Fail")
                             .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
                                     fname)
-                            .toLogger();
+                            .build().toLogger();
                 }
             }
         }
@@ -252,7 +252,7 @@ public class AlbianClassLoader extends BundleClassLoader {
             jis = new JarInputStream(new ByteArrayInputStream(b));
             sacnSingleJarBytes(spxFilename, jarFilename, map, jis);
         } catch (IOException e) {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("LoadSpxLib")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -261,12 +261,12 @@ public class AlbianClassLoader extends BundleClassLoader {
                     .takeBrief("Parser SpxLib Fail")
                     .addMessage("Unpacking or parser Albian.spx -> {0} to jar bytes array is fail.",
                                 spxFilename)
-                    .toLogger();
+                    .build().toLogger();
         } finally {
             try {
                 jis.close();
             } catch (IOException e) {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("LoadSpxLib")
                         .atLevel(LoggerLevel.Warn)
                         .byCalled(this.getClass())
@@ -274,7 +274,7 @@ public class AlbianClassLoader extends BundleClassLoader {
                         .takeBrief("Parser SpxLib Fail")
                         .addMessage("Close Albian.spx -> {0} is fail.maybe file-handler overflow.",
                                 spxFilename)
-                        .toLogger();
+                        .build().toLogger();
             }
         }
     }

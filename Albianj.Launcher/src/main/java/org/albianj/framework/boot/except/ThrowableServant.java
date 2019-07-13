@@ -29,7 +29,10 @@ public class ThrowableServant {
      * @param e
      * @return
      */
-    public StringBuilder makeCauseChainBuffer(Throwable e){
+    public String makeCauseChainBuffer(Throwable e){
+        if(null == e) {
+            return "NULL";
+        }
         Throwable ptr = null;
         Throwable rc = e;
         Stack<Throwable> causeStack = new Stack<>();
@@ -46,9 +49,9 @@ public class ThrowableServant {
         int len = sb.length();
         if(0 != len){
             sb.delete(len -4,len);
-            return sb;
+            return sb.toString();
         }
-        return null;
+        return "NULL";
     }
 
     /**
@@ -59,15 +62,16 @@ public class ThrowableServant {
      * @param refType
      * @return
      */
-    public StringBuilder makeStackChainBuffer(Throwable e,Class<?> refType){
-        StackTraceElement[] stes = e.getStackTrace();
-        String clzzName = null;
-        if(null != refType) {
-            refType.getName();
+    public String makeStackChainBuffer(Throwable e,Class<?> refType){
+        String callClassname = refType.getName();
+        if(null == e){
+            return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
         }
+
+        StackTraceElement[] stes = e.getStackTrace();
         StringBuilder sb = new StringBuilder();
         for(StackTraceElement ste : stes){
-            if ((null != refType) && !ste.getClassName().equals(clzzName)) {
+            if ((null != refType) && !ste.getClassName().equals(callClassname)) {
                 continue;
             }
             sb.append(ste.getClassName()).append(".").append(ste.getMethodName())
@@ -78,22 +82,25 @@ public class ThrowableServant {
         int len = sb.length();
         if(0 != len){
             sb.delete(len -4,len);
-            return sb;
+            return sb.toString();
         }
-        return null;
+        return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
     }
 
-    public StringBuilder buildThrowBuffer(Throwable e,Class<?> refType){
-        StringBuilder sb  = new StringBuilder();
+    public String throw2Buffer(Throwable e, Class<?> refType){
+        String calledClassname = refType.getName();
+        if(null == e) {
+            return StringServant.Instance.format("CalledClass:[{0}] Throwable:[NULL]",calledClassname);
+        }
         Throwable t = null;
+        String throwBuffer = null;
         do {
             if (e instanceof HiddenException) {
                 HiddenException he = (HiddenException) e;
-                sb.append("HiddenThrow:{")
-                        .append(" Breif:").append(he.getBrief())
-                        .append(" HideMsg:").append(he.getHideMsg())
-                        .append(" ShowMsg:").append(he.getShowMsg())
-                        .append(" Stacks:").append(makeStackChainBuffer(he, refType));
+                throwBuffer = StringServant.Instance.format(
+                        "HiddenException -> CallClass:[{0}] [Brief:[{1}] HideMsg:[{2}] Msg:[{3}] Stack:[{4}]",
+                        calledClassname,he.getBrief(),he.getHideMsg(),he.getShowMsg(),makeStackChainBuffer(he, refType));
+
                 if(he.hasInterThrow()){
                     t = he.getInterThrow();
                 }
@@ -101,34 +108,38 @@ public class ThrowableServant {
             }
             if (e instanceof DisplayException) {
                 DisplayException de = (DisplayException) e;
-                sb.append("DisplayThrow:{")
-                .append(" Breif:").append(de.getBrief())
-                .append(" ShowMsg:").append(de.getShowMsg())
-                .append(" Stacks:").append(makeStackChainBuffer(de, refType));
+                throwBuffer = StringServant.Instance.format(
+                        "DisplayException -> CallClass:[{0}] [Brief:[{1}] HideMsg:[{2}] Msg:[{3}] Stack:[{4}]",
+                        calledClassname,de.getBrief(),"NULL",de.getShowMsg(),makeStackChainBuffer(de, refType));
                 if(de.hasInterThrow()){
                     t = de.getInterThrow();
                 }
+                break;
+            }
+
+            if(e instanceof Throwable) {
+                throwBuffer = StringServant.Instance.format(
+                        "SystemException -> CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
+                        calledClassname,e.getMessage(),makeCauseChainBuffer(e),makeStackChainBuffer(e, refType));
             }
         }while(false);
 
         /**
-         * e is systemException
+         * has inner exception
+         *
          */
-        boolean isSystemException = false;
-        if(t == null){
-            t = e;
-            isSystemException = true;
+        String innerThrowBuffer = null;
+        if(null != t) {
+            /**
+             * not to recursion deal the throwable
+             * because HideException or DisplayException must be throw once
+             */
+            innerThrowBuffer = StringServant.Instance.format(
+                    "CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
+                    calledClassname,t.getMessage(),makeCauseChainBuffer(t),makeStackChainBuffer(t, refType));
         }
-
-        sb.append("SystemThrow:[")
-                .append(" Cause:").append(makeCauseChainBuffer(t))
-                .append(" Stacks:").append(makeStackChainBuffer(t, refType))
-                .append("]");
-
-        if(!isSystemException) {
-            sb.append("}");
-        }
-        return sb;
+        return StringServant.Instance.format("Throw:[{0}] InnerThrow:[{1}]",
+                throwBuffer,innerThrowBuffer);
     }
 
     /**
@@ -137,12 +148,29 @@ public class ThrowableServant {
      * @return 异常的字符串描述
      */
     public String printThrowStackTrace(Throwable e) {
+        if(null == e) {
+            return "NULL";
+        }
         ByteArrayOutputStream bo = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(bo);
         e.printStackTrace(pw);
         pw.flush();
         pw.close();
         return bo.toString();
+    }
+
+    /**
+     * 将异常的堆栈信息转为行式的字符串
+     * @param e 异常
+     * @return 异常的字符串描述
+     */
+    public String printThrowStackTraceForLineStyle(Throwable e) {
+        if(null == e) {
+            return "NULL";
+        }
+        String line = printThrowStackTrace(e);
+        return line.replace("\r\n"," >> ")
+                .replace("\n"," >> ");
     }
 
     public void throwDisplayException(Class<?> refType, Throwable interThrow, String brief, String fmt, Object...obj) {

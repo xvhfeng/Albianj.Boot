@@ -12,7 +12,6 @@ import org.albianj.framework.boot.servants.*;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 import org.w3c.dom.Node;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -102,54 +101,6 @@ public class ApplicationContext {
         return this;
     }
 
-
-//    public ApplicationContext addBundle(Class<?> refType, String name, String workFolder, Class<?> bundleType, boolean isInstallSpxFile) {
-//        if (this.phase != Phase.Prepare) {
-//            ThrowableServant.Instance.throwDisplayException(refType, null,
-//                    "Application Phase Error",
-//                    "App current phase is {0},it allow add the bundle only app is {1}.",
-//                    this.phase.getDescription(), Phase.Prepare.getDescription());
-//        }
-//        BundleConf bundleAttr = new BundleConf(name, workFolder, bundleType.getName(), isInstallSpxFile);
-//        attAttrs.put(name, bundleAttr);
-//        return this;
-//    }
-
-//    public ApplicationContext setLogger(ILogger logger) {
-//        this.logger = logger;
-//        return this;
-//    }
-//
-//    public ILogger findLogger() {
-//        return this.logger;
-//    }
-
-//    public void attachBundle(Class<?> refType, String name, String workFolder, String bundleTypeName, boolean isInstallSpxFile, String[] args) {
-//        if (this.phase != Phase.Run) {
-//            ThrowableServant.Instance.throwDisplayException(refType, null,
-//                    "Application Phase Error",
-//                    "App current phase is {0},it allow attach the bundle only app is {1}..",
-//                    this.phase.getDescription(), Phase.Run.getDescription());
-//        }
-//
-//        synchronized (this) {
-//            if (isBundleExist(name)) {
-//                ThrowableServant.Instance.throwDisplayException(refType, null,
-//                        "Repeat startup bundle.",
-//                        "Bundle -> {0} was starting.", name);
-//            }
-//            BundleConf conf = new BundleConf(name, workFolder, bundleTypeName, isInstallSpxFile);
-//            attAttrs.put(name, conf);
-//            BundleContext bundleCtx = BundleContext.newInstance()
-//                    .setBundleName(conf.getName())
-//                    .setWorkFolder(conf.getWorkFolder())
-//                    .setStartupClassName(conf.getStartupClassname())
-//                    .build(refType.getName());
-//            bundleContextMap.put(conf.getName(), bundleCtx);
-//            bundleCtx.startup(args);
-//        }
-//    }
-
     public boolean isBundleExist(String bundleName) {
         return bundleContextMap.containsKey(bundleName);
     }
@@ -180,28 +131,28 @@ public class ApplicationContext {
             if(!isThrowIfBundleNotExist) {
                 return null;
             } else {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("StartupThread")
                         .atLevel(LoggerLevel.Error)
                         .byCalled(refType)
                         .alwaysThrow(true)
                         .takeBrief("BundleContext Not Exist")
                         .addMessage("BundleContext cannot found by current Thread.Because classloader of currentThread is not BundleClassLoader or ChildClass of BundleClassLoader.")
-                        .toLogger();
+                        .build().toLogger();
             }
         }
         String bundleName = null;
         bundleName = ((BundleClassLoader) loader).getBundleName();
 
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(bundleName) && isThrowIfBundleNotExist) {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("StartupThread")
                     .atLevel(LoggerLevel.Error)
                     .byCalled(refType)
                     .alwaysThrow(true)
                     .takeBrief("BundleContext Not Exist")
                     .addMessage("Current BundleContext name is null or empty or allSpace.")
-                    .toLogger();
+                    .build().toLogger();
         }
 
         return findBundleContext(bundleName, isThrowIfBundleNotExist);
@@ -245,31 +196,31 @@ public class ApplicationContext {
          */
         LogServant.Instance.init(LogServant.RuntimeLogNameDef, logsPath, LogServant.RuntimeLogLevelDef, isOpenConsole);
 
-        LogServant.Instance.newLogPacket()
+        LogServant.Instance.newLogPacketBuilder()
                 .forSessionId("StartupThread")
                 .atLevel(LoggerLevel.Info)
                 .byCalled(this.getClass())
                 .takeBrief("Albianj Application Startup")
                 .addMessage("Albianj application startuping by using RuntimeLogger with folder -> {0} and {1} open ConsoleLogger.",
                         logsPath, isOpenConsole ? "" : "not")
-                .toLogger();
+                .build().toLogger();
 
 
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(workFolder)) {
             if (null == this.appStartupType) {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("StartupThread")
                         .atLevel(LoggerLevel.Error)
                         .byCalled(this.getClass())
                         .alwaysThrow(true)
                         .takeBrief("Run Argument Error")
                         .addMessage("Application's workfolder or Class of main() function must set one.And we recommend set workfolder.")
-                        .toLogger();
+                        .build().toLogger();
             }
 
             String workFolder = TypeServant.Instance.classResourcePathToFileSystemWorkFolder(this.appStartupType);
             if (!FileServant.Instance.isFileOrPathExist(workFolder)) {
-                LogServant.Instance.newLogPacket()
+                LogServant.Instance.newLogPacketBuilder()
                         .forSessionId("StartupThread")
                         .atLevel(LoggerLevel.Error)
                         .byCalled(this.getClass())
@@ -277,25 +228,25 @@ public class ApplicationContext {
                         .takeBrief("Run Argument Error")
                         .addMessage("Application's workfolder is not exist,then workpath -> {0} is setting by class -> {1}.",
                                 workFolder, this.appStartupType.getName())
-                        .toLogger();
+                        .build().toLogger();
             }
             this.workFolder = workFolder;
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("StartupThread")
                     .atLevel(LoggerLevel.Info)
                     .byCalled(this.getClass())
                     .takeBrief("Runtime Argument Defaulter")
                     .addMessage("Setting workFolder to -> {0} by class -> {1} default.",
                             workFolder, this.appStartupType.getName())
-                    .toLogger();
+                    .build().toLogger();
         } else {
-            LogServant.Instance.newLogPacket()
+            LogServant.Instance.newLogPacketBuilder()
                     .forSessionId("StartupThread")
                     .atLevel(LoggerLevel.Info)
                     .byCalled(this.getClass())
                     .takeBrief("Runtime Settings")
                     .addMessage("Application startup at workFolder -> {0}.", workFolder)
-                    .toLogger();
+                    .build().toLogger();
         }
 
         this.workFolder = FileServant.Instance.makeFolderWithSuffixSep(this.workFolder);
@@ -376,16 +327,16 @@ public class ApplicationContext {
         String mid = xmlParserCtx.findNodeValue("Application/MachineId", true, false);
         String mkey = xmlParserCtx.findNodeValue("Application/MachineKey", true, false);
         String runtimeLevel = xmlParserCtx.findNodeValue("Application/RuntimeLevel", true, false);
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(runtimeLevel)) {
+        if (StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(runtimeLevel)) {
             appConf.setRuntimeLevel(runtimeLevel);
         }
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(appName)) {
+        if (StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(appName)) {
             appConf.setAppName(appName);
         }
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(mkey)) {
+        if (StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(mkey)) {
             appConf.setMachineKey(mkey);
         }
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(mid)) {
+        if (StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(mid)) {
             appConf.setMachineId(mid);
         }
 
@@ -439,7 +390,7 @@ public class ApplicationContext {
         String startup = xmlParserCtx.findAttributeValue(bundleNode, "Startup", false, true);
         String installSpxFile = xmlParserCtx.findAttributeValue(bundleNode, "InstallSpxFile", true, false);
         boolean isInstallSpxFile = false;
-        if (StringServant.Instance.isNotNullOrEmptyOrAllSpace(installSpxFile)) {
+        if (StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(installSpxFile)) {
             try {
                 isInstallSpxFile = Boolean.valueOf(installSpxFile);
             } catch (Exception e) {
