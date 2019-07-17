@@ -11,7 +11,7 @@ import org.albianj.framework.boot.tags.BundleSharingTag;
  */
 @BundleSharingTag
 public class DisplayException extends RuntimeException {
-    protected Throwable interThrow = null;
+    protected Throwable innerThrow = null;
     protected String showMsg = null;
     protected String brief;
     protected boolean hasInterThrow = false;
@@ -32,14 +32,14 @@ public class DisplayException extends RuntimeException {
      *
      * @param brief  : 简短的异常描述,通常可以包括异常的id,唯一性指标,业务/模块名称等等
      * @param showMsg    : 异常的详细信息,注意:不能包括敏感信息,包括但不限于密码,用户名,手机,身份证号,数据库信息等等
-     * @param interThrow : 原先程序抛出的异常
+     * @param innerThrow : 原先程序抛出的异常
      */
-    public DisplayException(Class<?> refType, Throwable interThrow, String brief, String showMsg) {
+    public DisplayException(Class<?> refType, Throwable innerThrow, String brief, String showMsg) {
         this.brief = brief;
         this.showMsg = showMsg;
-        if(null != interThrow) {
+        if(null != innerThrow) {
             this.hasInterThrow = true;
-            this.interThrow = interThrow;
+            this.innerThrow = innerThrow;
         }
         this.refType = refType;
     }
@@ -49,21 +49,34 @@ public class DisplayException extends RuntimeException {
     public String getShowMsg(){
         return this.showMsg;
     }
+
+    /**
+     * exception的简单message
+     * @return
+     */
     @Override
     public String toString() {
-        return StringServant.Instance.format("Brief:{0},ShowMsg:{1}",brief,showMsg);
+        return StringServant.Instance.format("Brief:[{0}],ShowMsg:[{1}]",
+                brief,showMsg);
     }
 
     public String getMessage() {
         return toString();
     }
 
+    /**
+     * 异常的详细message
+     * @return
+     */
     public String getLocalizedMessage() {
-        return toString();
+        String innerThrowMsg = null == innerThrow ? "NULL" : ThrowableServant.Instance.printThrowStackTrace(innerThrow);
+        String causeMsg = null == innerThrow ? "NULL" : ThrowableServant.Instance.findThrowCauseMsg(innerThrow);
+        return StringServant.Instance.format("RefClass:[{0}],Brief:[{1}],ShowMsg:[{2}],Cause:[{3}],Throw:[{4}]",
+                refType.getName(),brief,showMsg,causeMsg,innerThrowMsg);
     }
 
-    public Throwable getInterThrow(){
-        return this.interThrow;
+    public Throwable getInnerThrow(){
+        return this.innerThrow;
     }
 
     public boolean hasInterThrow(){

@@ -1,6 +1,6 @@
 package org.albianj.framework.boot;
 
-import org.albianj.framework.boot.loader.AlbianClassLoader;
+import org.albianj.framework.boot.loader.AlbianSpxClassLoader;
 import org.albianj.framework.boot.loader.BundleClassLoader;
 import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.servants.StringServant;
@@ -102,7 +102,7 @@ public class BundleContext {
     public BundleContext build(){
         if(null == this.classLoader) {
             BundleClassLoader classLoader = isInstallSpxFile
-                    ?  AlbianClassLoader.newInstance(bundleName)
+                    ?  AlbianSpxClassLoader.newInstance(bundleName)
                     : BundleClassLoader.newInstance(bundleName);
 
             this.classLoader = classLoader;
@@ -222,7 +222,9 @@ public class BundleContext {
 //                    BundleContext ctx = ApplicationContext.Instance.findBundleContext(bundleName, true);
                     String startupTypeName = bctx.getStartupClassName();
                     try {
-                        Class<?> clzz = bctx.getClassLoader().loadClass(startupTypeName);
+                        BundleClassLoader loader = (BundleClassLoader) bctx.getClassLoader();
+                        loader.scanAllClass(bctx);
+                        Class<?> clzz = loader.loadClass(startupTypeName);
                         Object launcher =  clzz.newInstance();
                         Method startup = null;
                         startup = clzz.getMethod("startup");

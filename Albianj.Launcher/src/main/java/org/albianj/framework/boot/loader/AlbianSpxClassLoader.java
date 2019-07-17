@@ -56,18 +56,18 @@ import java.util.Map;
 import java.util.jar.JarInputStream;
 
 @BundleSharingTag
-public class AlbianClassLoader extends BundleClassLoader {
+public class AlbianSpxClassLoader extends BundleClassLoader {
 
     private Map<String, TypeFileMetadata> mapTypesInSpxLib;
 
-    protected AlbianClassLoader(String bundleName) {
+    protected AlbianSpxClassLoader(String bundleName) {
         super(bundleName);
         mapTypesInSpxLib = new HashMap<>();
     }
 
     @Override
-    public void loadAllClass(BundleContext bctx) {
-        super.loadAllClass(bctx);
+    public void scanAllClass(BundleContext bctx) {
+        super.scanAllClass(bctx);
         loadSpxLib(bctx);
     }
 

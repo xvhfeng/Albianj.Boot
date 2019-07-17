@@ -6,8 +6,12 @@ import org.albianj.framework.boot.tags.BundleSharingTag;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.security.ProtectionDomain;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.JarInputStream;
 
 @BundleSharingTag
@@ -104,7 +108,7 @@ public class TypeServant {
         if(path.startsWith("jar:")){ //use maven protocol
             return classResourcePathToFileSystemWorkFolder(clzz);
         }
-            return fileProtoUrl2FileSystemPath(clzz);
+            return findFilenameByClassWithFileProtocol(clzz);
     }
 
     public boolean isClassInJar(Class<?> clzz){
@@ -119,13 +123,13 @@ public class TypeServant {
      * @param jarSimpleName
      * @return
      */
-    public String findClassParentJar(Class<?> clzz,RefArg<String> jarSimpleName){
+    public String findJarFilenameByClassWithJarProtocol(Class<?> clzz, RefArg<String> jarSimpleName){
         String url = clzz.getResource("").toString();
         String path = null;
         if(url.startsWith("jar:")) {
             int jarSepIdx = url.lastIndexOf("!");
             path = url.substring(10,jarSepIdx);//jar proto must with file proto
-            jarSimpleName.setValue(path.substring(path.lastIndexOf("/",path.lastIndexOf(".")+1)));
+            jarSimpleName.setValue(path.substring(path.lastIndexOf("/") + 1));
         }
         return path.replace("/",File.separator);
     }
@@ -133,7 +137,7 @@ public class TypeServant {
      * file协议的路径转换成文件系统的路径
      * @return
      */
-    public String fileProtoUrl2FileSystemPath(Class<?> clzz){
+    public String findFilenameByClassWithFileProtocol(Class<?> clzz){
         String simpleClassname = clzz.getSimpleName();
         URL url = clzz.getResource("");
         String filename = url.toString() + simpleClassname + ".class";
@@ -154,6 +158,69 @@ public class TypeServant {
         return (!Modifier.isAbstract(mod)) && (!Modifier.isInterface(mod));
     }
 
+    /**
+     * 通过classload的domain来获取jar
+     * @param domain
+     * @return
+     */
+    public String findJarFilenameByDomainWithJarProtocol(ProtectionDomain domain){
+//        file:/C:/Users/xuhaifeng/.m2/repository/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar
+        String filename = domain.getCodeSource().getLocation().getFile();
+        if(filename.startsWith("/")) {
+            filename =  filename.substring(1);
+        }
+        return filename.replace("/",File.separator);
+    }
 
+    /**
+     * get system classloer ProtectionDomain
+     * @param loader
+     * @return
+     */
+    public Set<String> findJarFullFilenameByPrivatedDoamins(ClassLoader loader) throws NoSuchFieldException, IllegalAccessException {
+        Set<String> domains = new HashSet<>();
+        Class<?> clzz = ClassLoader.class;
+        Field f = clzz.getDeclaredField("domains");
+        if (null == f) {
+            return null;
+        }
+        f.setAccessible(true);
+        Object obj = f.get(loader);
+        Set<ProtectionDomain> loadDomains = (Set<ProtectionDomain>) obj;
+        for(ProtectionDomain pd :loadDomains){
+            String file = findJarFilenameByDomainWithJarProtocol(pd);
+            if(file.endsWith(".jar")
+                    && !file.contains("Albianj.Launcher")
+//                    && !file.contains("IntelliJIdea")
+                    && !file.contains("eclipse")) {
+                domains.add(file);
+            }
+        }
+        return domains;
+    }
+
+    /**
+     * 得到jar的简单名称
+     * @param filename
+     * @return
+     */
+    public String getJarSimpleFilename(String filename){
+        return filename.substring(filename.lastIndexOf(File.separator) + 1);
+    }
+
+//    public String clzzParentJar(Class<?> clzz) throws NoSuchFieldException, IllegalAccessException {
+//        Package pkg = clzz.getPackage();
+//        Set<String> domains = findJarByPrivatedDoamins(clzz.getClassLoader());
+//        String pkgName = pkg.getName();
+//        String implTitle = pkg.getImplementationTitle();
+//        String implVersion = pkg.getImplementationVersion();
+//        for(String fname :  domains) {
+//            String url = domain.getCodeSource().getLocation().toString();
+//            if(url.contains(pkgName) && url.contains(implTitle) &&url.contains(implVersion)) {
+//                return url.substring(6); // substring with begin "file:/"
+//            }
+//        }
+//        return null;
+//    }
 
 }

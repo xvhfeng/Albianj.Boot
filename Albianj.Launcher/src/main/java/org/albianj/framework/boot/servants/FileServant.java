@@ -129,4 +129,9 @@ public class FileServant {
         return rcFiles;
     }
 
+    public String getFolderName(String filename){
+        File f = new File(filename);
+        return f.getParentFile().toString();
+    }
+
 }

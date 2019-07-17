@@ -1,7 +1,5 @@
 package org.albianj.framework.boot.logging;
 
-import org.albianj.framework.boot.ApplicationContext;
-import org.albianj.framework.boot.BundleContext;
 import org.albianj.framework.boot.except.DisplayException;
 import org.albianj.framework.boot.except.HiddenException;
 import org.albianj.framework.boot.except.ThrowableServant;
@@ -171,7 +169,7 @@ public class LogPacket {
                 level.getTag(),sessionId,bundleName,
                 rt.getId(),rt.getName(),
                 brief,secretMsg,logMsg,
-                ThrowableServant.Instance.throw2Buffer(cause,refType),
+                ThrowableServant.Instance.excp2LogMsg(cause,refType),
                 System.lineSeparator());
 
         return msg;

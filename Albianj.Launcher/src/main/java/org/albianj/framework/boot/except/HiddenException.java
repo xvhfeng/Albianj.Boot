@@ -50,10 +50,14 @@ public class HiddenException extends DisplayException {
     }
 
     /**
-     * 有隐私信息被披露，慎用
+     * 异常的详细message
+     * 可能会具有敏感信息
      * @return
      */
     public String getLocalizedMessage() {
-        return StringServant.Instance.format("Brief:{0},HideMsg:{1},ShowMsg:{2}",brief,hideMsg,showMsg);
+        String innerThrowMsg = null == innerThrow ? "NULL" : ThrowableServant.Instance.printThrowStackTrace(innerThrow);
+        String causeMsg = null == innerThrow ? "NULL" : ThrowableServant.Instance.findThrowCauseMsg(innerThrow);
+        return StringServant.Instance.format("RefClass:[{0}],Brief:[{1}],HideMsg:[{2}],ShowMsg:[{3}],Cause:[{4}],Throw:[{5}]",
+                refType.getName(),brief,hideMsg,showMsg,causeMsg,innerThrowMsg);
     }
 }

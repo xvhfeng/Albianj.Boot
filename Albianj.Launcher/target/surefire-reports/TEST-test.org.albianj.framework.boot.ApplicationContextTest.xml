@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.012" errors="0" skipped="0" tests="24" name="test.org.albianj.framework.boot.ApplicationContextTest">
+<testsuite failures="0" time="0.008" errors="0" skipped="0" tests="24" name="test.org.albianj.framework.boot.ApplicationContextTest">
   <properties>
     <property name="idea.version" value="2018.2.4"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.7.0_79\jre\bin"/>
     <property name="java.vm.version" value="24.79-b02"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="D:\work\github\Albianj.Boot"/>
+    <property name="maven.multiModuleProjectDirectory" value="D:\work\github\Albianj.Boot\Albianj.Launcher"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=";"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -17,7 +17,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="D:\work\github\Albianj.Boot"/>
+    <property name="user.dir" value="D:\work\github\Albianj.Boot\Albianj.Launcher"/>
     <property name="java.runtime.version" value="1.7.0_79-b15"/>
     <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.7.0_79\jre\lib\endorsed"/>
@@ -66,24 +66,24 @@
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testLoadAppConf"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testAttachBundle"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindConfigFile"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetAppStartupType"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetAppStartupType"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testRun"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindRootBundleThread"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindRootBundleThread"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfXmlParserCtx"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfForXmlParserCtxBundleNode"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserAppRuntimeLoggerConf"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserChildBundlesConfForXmlParserCtxBundleNode"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserAppRuntimeLoggerConf"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindLogger"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testExitSystem"/>
-  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetRuntimeLogger"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetRuntimeLogger"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testBuildApplicationRuntime"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testAddBundle"/>
-  <testcase time="0.002" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsBundleExist"/>
+  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsBundleExist"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testFindCurrentBundleContext"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetPhaseCode"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetDescription"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testGetDescription"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testParserAppBundleConf"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetLogger"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetWorkFolder"/>
-  <testcase time="0.001" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsWindows"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetLogger"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testSetWorkFolder"/>
+  <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testIsWindows"/>
   <testcase time="0" classname="test.org.albianj.framework.boot.ApplicationContextTest" name="testRepair"/>
 </testsuite>

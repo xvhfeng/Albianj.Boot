@@ -36,9 +36,9 @@ public class ThrowableServant {
         Throwable ptr = null;
         Throwable rc = e;
         Stack<Throwable> causeStack = new Stack<>();
-        causeStack.push(rc); // push first interThrow
+        causeStack.push(rc); // push first innerThrow
         while(null != (ptr = rc.getCause())  && (rc != ptr) ) {
-            causeStack.push(ptr); // push interThrow chain
+            causeStack.push(ptr); // push innerThrow chain
             rc = ptr;
         }
 
@@ -52,6 +52,24 @@ public class ThrowableServant {
             return sb.toString();
         }
         return "NULL";
+    }
+
+    /**
+     * 得到throw的最后一个cause的message
+     * @param e
+     * @return
+     */
+    public String findThrowCauseMsg(Throwable e){
+        if(null == e) {
+            return "NULL";
+        }
+
+        Throwable ptr = null;
+        Throwable rc = e;
+        while(null != (ptr = rc.getCause())) {
+            rc = ptr;
+        }
+        return StringServant.Instance.format("Type:[{0}] Msg:[{1}]",rc.getClass().getName(),rc.getMessage());
     }
 
     /**
@@ -87,59 +105,45 @@ public class ThrowableServant {
         return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
     }
 
-    public String throw2Buffer(Throwable e, Class<?> refType){
+    public String excp2LogMsg(Throwable e, Class<?> refType){
         String calledClassname = refType.getName();
         if(null == e) {
-            return StringServant.Instance.format("CalledClass:[{0}] Throwable:[NULL]",calledClassname);
+            return StringServant.Instance.format("RefType:[{0}] Throwable:[NULL]",calledClassname);
         }
         Throwable t = null;
         String throwBuffer = null;
-        do {
-            if (e instanceof HiddenException) {
-                HiddenException he = (HiddenException) e;
-                throwBuffer = StringServant.Instance.format(
-                        "HiddenException -> CallClass:[{0}] [Brief:[{1}] HideMsg:[{2}] Msg:[{3}] Stack:[{4}]",
-                        calledClassname,he.getBrief(),he.getHideMsg(),he.getShowMsg(),makeStackChainBuffer(he, refType));
-
-                if(he.hasInterThrow()){
-                    t = he.getInterThrow();
-                }
-                break;
-            }
-            if (e instanceof DisplayException) {
-                DisplayException de = (DisplayException) e;
-                throwBuffer = StringServant.Instance.format(
-                        "DisplayException -> CallClass:[{0}] [Brief:[{1}] HideMsg:[{2}] Msg:[{3}] Stack:[{4}]",
-                        calledClassname,de.getBrief(),"NULL",de.getShowMsg(),makeStackChainBuffer(de, refType));
-                if(de.hasInterThrow()){
-                    t = de.getInterThrow();
-                }
-                break;
-            }
-
-            if(e instanceof Throwable) {
-                throwBuffer = StringServant.Instance.format(
-                        "SystemException -> CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
-                        calledClassname,e.getMessage(),makeCauseChainBuffer(e),makeStackChainBuffer(e, refType));
-            }
-        }while(false);
-
-        /**
-         * has inner exception
-         *
-         */
-        String innerThrowBuffer = null;
-        if(null != t) {
-            /**
-             * not to recursion deal the throwable
-             * because HideException or DisplayException must be throw once
-             */
-            innerThrowBuffer = StringServant.Instance.format(
-                    "CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
-                    calledClassname,t.getMessage(),makeCauseChainBuffer(t),makeStackChainBuffer(t, refType));
+//        if (e instanceof HiddenException) {
+//            HiddenException he = (HiddenException) e;
+//            throwBuffer = he.getLocalizedMessage();
+//          return throwBuffer;
+//        }
+        if (e instanceof DisplayException) { // hidden exception is do this
+            DisplayException de = (DisplayException) e;
+            throwBuffer = de.getLocalizedMessage();
+            return throwBuffer;
         }
-        return StringServant.Instance.format("Throw:[{0}] InnerThrow:[{1}]",
-                throwBuffer,innerThrowBuffer);
+
+        throwBuffer = StringServant.Instance.format(
+                "SystemException -> RefType:[{0}] Msg:[{1}] Cause:[Type:[{2}],Msg:[{3}]] Stack:[{4}]",
+                calledClassname,e.getMessage(),e.getClass().getName(),findThrowCauseMsg(e),printThrowStackTrace(e));
+        return throwBuffer;
+
+//        /**
+//         * has inner exception
+//         *
+//         */
+//        String innerThrowBuffer = null;
+//        if(null != t) {
+//            /**
+//             * not to recursion deal the throwable
+//             * because HideException or DisplayException must be throw once
+//             */
+//            innerThrowBuffer = StringServant.Instance.format(
+//                    "CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
+//                    calledClassname,t.getMessage(),makeCauseChainBuffer(t),printThrowStackTrace(t));
+//        }
+//        return StringServant.Instance.format("Throw:[{0}] InnerThrow:[{1}]",
+//                throwBuffer,innerThrowBuffer);
     }
 
     /**
@@ -161,17 +165,18 @@ public class ThrowableServant {
 
     /**
      * 将异常的堆栈信息转为行式的字符串
-     * @param e 异常
+//     * @param e 异常
      * @return 异常的字符串描述
      */
-    public String printThrowStackTraceForLineStyle(Throwable e) {
-        if(null == e) {
-            return "NULL";
-        }
-        String line = printThrowStackTrace(e);
-        return line.replace("\r\n"," >> ")
-                .replace("\n"," >> ");
-    }
+//    public String printThrowStackTraceForLineStyle(Throwable e) {
+//        if(null == e) {
+//            return "NULL";
+//        }
+//        String line = printThrowStackTrace(e);
+//        return line.replace("\r\n","")
+//                .replace("\n","")
+//                .replace("  ","");
+//    }
 
     public void throwDisplayException(Class<?> refType, Throwable interThrow, String brief, String fmt, Object...obj) {
         String msg = StringServant.Instance.format(fmt,obj);
