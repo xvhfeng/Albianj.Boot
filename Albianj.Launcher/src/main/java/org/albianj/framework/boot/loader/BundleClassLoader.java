@@ -52,6 +52,7 @@ import java.util.jar.JarInputStream;
 @BundleSharingTag
 public class BundleClassLoader extends ClassLoader {
     private String bundleName = null;
+    private ClassLoader parent = null;
     /**
      * key - full classname
      * value - class file metadata
@@ -61,7 +62,8 @@ public class BundleClassLoader extends ClassLoader {
     protected Set<String> jarFileSet = null;
 
     protected BundleClassLoader(String bundleName) {
-        super(ClassLoader.getSystemClassLoader());
+        super();
+        this.parent = Thread.currentThread().getContextClassLoader();
         this.bundleName = bundleName;
         totalFileMetadatas = new HashMap<>();
         jarFileSet = new HashSet<>();
@@ -128,7 +130,7 @@ public class BundleClassLoader extends ClassLoader {
 
             //AppClassLoader
 
-            ClassLoader loader =  ClassLoader.getSystemClassLoader();
+            ClassLoader loader =  this.parent;
             clzz = loader.loadClass(name);
             if (clzz != null) {
                 if (resolve)
@@ -448,9 +450,9 @@ public class BundleClassLoader extends ClassLoader {
 //    }
 
     public void scanClassesFile(String fromFolder,String rootFinder, String currFinder, Map<String, TypeFileMetadata> map) {
-        File finder = new File(rootFinder);
+        File finder = new File(currFinder);
         if (!finder.exists()) {
-
+            return;
         }
 
         File[] files = finder.listFiles(new FileFilter() {
@@ -479,9 +481,10 @@ public class BundleClassLoader extends ClassLoader {
                      * it never use for scan all classes not loaded by app classloader
                      *
                      */
-                    Class<?> cla = defineClass(f.getAbsolutePath(), bytes, 0, bytes.length);
+//                    Class<?> cla = defineClass(f.getAbsolutePath(), bytes, 0, bytes.length);
                     TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
-                    cfm.setType(cla);
+//                    cfm.setType(cla);
+                    map.put(cfm.mkKey(), cfm);
                 } catch (Exception e) {
 
                 }
@@ -580,10 +583,23 @@ public class BundleClassLoader extends ClassLoader {
         scanJarFolder("lib",libFolder, totalFileMetadatas);
         scanClassesFile("classes",classesFolder, classesFolder, totalFileMetadatas);
         scanJarFolder("bin",binFolder, totalFileMetadatas);
+        String classpath = this.parent.getResource("").getPath();
+        if(StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(classpath)) {
+            File root = new File(classpath);
+            LogServant.Instance.newLogPacketBuilder().addMessage("Scan Class in classpath -> {0}.",
+                    root.getName())
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Debug)
+                    .byCalled(this.getClass())
+                    .forSessionId("loadclass")
+                    .takeBrief("Scaning Class")
+                    .build().toLogger();
+            scanClassesFile("classpath",root.getName(), root.getName(), totalFileMetadatas);
+        }
 
         for(Map.Entry<String,TypeFileMetadata> entry : totalFileMetadatas.entrySet()) {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}.",
-                    entry.getValue().getFullClassNameWithoutSuffix())
+            LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}. It's key -> {1}.",
+                    entry.getValue().getFullClassNameWithoutSuffix(),entry.getKey())
                     .aroundBundle(this.bundleName)
                     .atLevel(LoggerLevel.Debug)
                     .byCalled(this.getClass())
