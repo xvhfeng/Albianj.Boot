@@ -33,6 +33,7 @@ public class BundleContext {
     private String appsFolder;
     private Phase phase;
     private String[] args;
+    private boolean isPrintScanClasses = false;
 
     public BundleContext setBundleName(String name){
         this.bundleName = name;
@@ -46,6 +47,11 @@ public class BundleContext {
 
     public BundleContext setStartupClassName(String  startupClassname){
         this.startupClassname = startupClassname;
+        return this;
+    }
+
+    public BundleContext openPrintScanClasses(){
+        this.isPrintScanClasses = true;
         return this;
     }
 
@@ -191,6 +197,10 @@ public class BundleContext {
 
     public String[] getArgs() {
         return args;
+    }
+
+    public boolean isPrintScanClasses(){
+        return this.isPrintScanClasses;
     }
 
     public BundleContext setArgs(String[] args) {

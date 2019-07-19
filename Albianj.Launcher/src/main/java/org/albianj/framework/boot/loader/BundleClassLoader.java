@@ -77,7 +77,7 @@ public class BundleClassLoader extends ClassLoader {
         return this.bundleName;
     }
 
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
+    public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
         LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} ready to load.",name)
                 .aroundBundle(this.bundleName)
                 .atLevel(LoggerLevel.Debug)
@@ -237,217 +237,6 @@ public class BundleClassLoader extends ClassLoader {
         }
         return clzz;
     }
-//    @Override
-//    protected Class<?> findClass(String name) throws ClassNotFoundException {
-//
-//        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was ready to find by findClass.",name)
-//                .aroundBundle(this.bundleName)
-//                .atLevel(LoggerLevel.Debug)
-//                .byCalled(this.getClass())
-//                .forSessionId("loadclass")
-//                .takeBrief("Loading Class")
-//                .build().toLogger();
-//
-//        /**
-//         * find from jar or classes folder
-//         */
-//        TypeFileMetadata cfm = totalFileMetadatas.get(name);
-//        Class<?> clzz = null;
-//        if (cfm != null) {
-//            if(null != cfm.getType()) {
-//                return cfm.getType();
-//            }
-//            byte[] bytes = cfm.getFileContentBytes();
-//            try {
-//                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was found by TypeFileMetadata and ready to loading it.",name)
-//                        .aroundBundle(this.bundleName)
-//                        .atLevel(LoggerLevel.Debug)
-//                        .byCalled(this.getClass())
-//                        .forSessionId("loadclass")
-//                        .takeBrief("Loading Class")
-//                        .build().toLogger();
-//
-//                clzz = defineClass(name, bytes, 0, bytes.length);
-//            }catch (Exception e){
-//                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} defined by BundleClassLoder from TypeFileMetadate was fail .",name)
-//                        .aroundBundle(this.bundleName)
-//                        .atLevel(LoggerLevel.Error)
-//                        .alwaysThrow(true)
-//                        .byCalled(this.getClass())
-//                        .withCause(e)
-//                        .forSessionId("loadclass")
-//                        .takeBrief("Loading Class")
-//                        .build().toLogger();
-//            }
-//            cfm.setType(clzz);
-//            return clzz;
-//        }
-//
-//        /**
-//         *  if not find from lib directory then find from system classloader
-//         */
-//        ClassLoader appLoader = ClassLoader.getSystemClassLoader(); // app loader
-//        try {
-//            clzz = appLoader.loadClass(name);
-//        }catch (Exception e){
-//            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was loaded fail by App SystemClassLoader.",name)
-//                    .aroundBundle(this.bundleName)
-//                    .atLevel(LoggerLevel.Error)
-//                    .byCalled(this.getClass())
-//                    .alwaysThrow(true)
-//                    .withCause(e)
-//                    .forSessionId("loadclass")
-//                    .takeBrief("Loading Class")
-//                    .build().toLogger();
-//        }
-//
-//        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was loaded success by App SystemClassLoader,then reload by BundleClassLoader.",name)
-//                .aroundBundle(this.bundleName)
-//                .atLevel(LoggerLevel.Debug)
-//                .byCalled(this.getClass())
-//                .forSessionId("loadclass")
-//                .takeBrief("Loading Class")
-//                .build().toLogger();
-//
-//        if (clzz != null) { //reload class by custom loader
-//            if (clzz.isAnnotationPresent(BundleSharingTag.class)) {
-//                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} is BundleSharing,so not need reload.",name)
-//                        .aroundBundle(this.bundleName)
-//                        .atLevel(LoggerLevel.Debug)
-//                        .byCalled(this.getClass())
-//                        .forSessionId("loadclass")
-//                        .takeBrief("Loading Class")
-//                        .build().toLogger();
-//
-//                return clzz;
-//            }
-//
-//            /**
-//             *  interface is not transmit annotation,
-//             *  so we check everyone and try one by one
-//             */
-//            Class<?>[] itfs = clzz.getInterfaces();
-//            if (null != itfs) {
-//                for (Class<?> itf : itfs) {
-//                    // only one interface is sharing,child class must be sharing
-//                    if (itf.isAnnotationPresent(BundleSharingTag.class)) {
-//                        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} is BundleSharing because  it's interface -> {0} is BundleSharing,so not need reload.",
-//                                name,itf.getName())
-//                                .aroundBundle(this.bundleName)
-//                                .atLevel(LoggerLevel.Debug)
-//                                .byCalled(this.getClass())
-//                                .forSessionId("loadclass")
-//                                .takeBrief("Loading Class")
-//                                .build().toLogger();
-//
-//                        return clzz;
-//                    }
-//                }
-//            }
-//
-//            /**
-//             *  privately-owned class
-//             *  so we relaod it by bundle classloader in bundle range
-//             */
-//            if(TypeServant.Instance.isClassInJar(clzz)){
-//                /**
-//                 * class in jar then use jar protocol
-//                 * if use maven,jarfile in the .m2 repository
-//                 * or maybe referenced in IDE in classpath(we not try it).
-//                 */
-//                RefArg<String> jarSimpleName = new RefArg<>();
-//                String jarName = TypeServant.Instance.findJarFilenameByClassWithJarProtocol(clzz,jarSimpleName);
-//
-//                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} is in jarFile ->{1}.so unpacking the jar and loading it.",
-//                        name,jarName)
-//                        .aroundBundle(this.bundleName)
-//                        .atLevel(LoggerLevel.Debug)
-//                        .byCalled(this.getClass())
-//                        .forSessionId("loadclass")
-//                        .takeBrief("Loading Class")
-//                        .build().toLogger();
-//                scanJarFile(jarName,jarName,totalFileMetadatas);
-//                if(!totalFileMetadatas.containsKey(name)) {
-//                    /**
-//                     * interface and impl-class is not loading
-//                     * so we need load  from system classloader
-//                     */
-//                    try {
-//                        Set<String> jarFilenames =  TypeServant.Instance.findJarFullFilenameByPrivatedDoamins(clzz.getClassLoader());
-//                        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} is not in jarFile ->{1}.so we try it from PrivatedDoamins.",
-//                                name,jarName)
-//                                .aroundBundle(this.bundleName)
-//                                .atLevel(LoggerLevel.Debug)
-//                                .byCalled(this.getClass())
-//                                .forSessionId("loadclass")
-//                                .takeBrief("Loading Class")
-//                                .build().toLogger();
-//                        for(String jarFilename :jarFilenames){
-//                            scanJarFile(FileServant.Instance.getFolderName(jarFilename),jarFilename,totalFileMetadatas);
-//                        }
-//                    } catch (Exception e) {
-//                        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} loading by app classloader PrivatedDomain was fail.",name)
-//                                .aroundBundle(this.bundleName)
-//                                .atLevel(LoggerLevel.Error)
-//                                .byCalled(this.getClass())
-//                                .alwaysThrow(true)
-//                                .withCause(e)
-//                                .forSessionId("loadclass")
-//                                .takeBrief("Loading Class")
-//                                .build().toLogger();
-//                    }
-//                }
-//                if(!totalFileMetadatas.containsKey(name)) {
-//                    LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} not found by all FileMetadatas.",name)
-//                            .aroundBundle(this.bundleName)
-//                            .atLevel(LoggerLevel.Error)
-//                            .byCalled(this.getClass())
-//                            .alwaysThrow(true)
-//                            .forSessionId("loadclass")
-//                            .takeBrief("Loading Class")
-//                            .build().toLogger();
-//                }
-//                clzz =  findClass(name);
-//                return clzz;
-//            } else {
-//                /**
-//                 * class in filesystem then use file protocol
-//                 */
-//                String path = TypeServant.Instance.findFilenameByClassWithFileProtocol(clzz);
-//                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} is in systemfile ->{1}.so loading it.",
-//                        name,path)
-//                        .aroundBundle(this.bundleName)
-//                        .atLevel(LoggerLevel.Debug)
-//                        .byCalled(this.getClass())
-//                        .forSessionId("loadclass")
-//                        .takeBrief("Loading Class")
-//                        .build().toLogger();
-//
-//                byte[] data = FileServant.Instance.getFileBytes(path);
-//                if (null != data) {
-//                    return defineClass(name, data, 0, data.length);
-//                }
-//            }
-//        }
-//
-//        LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} loading by BundleClassLoader is fail.try use the third classload to load it in possible.",
-//                name)
-//                .aroundBundle(this.bundleName)
-//                .atLevel(LoggerLevel.Debug)
-//                .byCalled(this.getClass())
-//                .forSessionId("loadclass")
-//                .takeBrief("Loading Class")
-//                .build().toLogger();
-//
-//        /**
-//         *  try with third classloader at last time in possible
-//         */
-//        Class<?> c = Class.forName(cfm.getFullClassName()); //when use app container such as jetty then use
-//        if (null != c) {
-//            return c;
-//        }
-//        return super.findClass(name);
-//    }
 
     public void scanClassesFile(String fromFolder,String rootFinder, String currFinder, Map<String, TypeFileMetadata> map) {
         File finder = new File(currFinder);
@@ -579,7 +368,7 @@ public class BundleClassLoader extends ClassLoader {
      * @param classesFolder
      * @param libFolder
      */
-    private void scanAllClass(String binFolder, String classesFolder, String libFolder) {
+    private void scanAllClass(String binFolder, String classesFolder, String libFolder,boolean isPrintScanClasses) {
         /**
          * because load priority,so  low priority loading before high priority
          */
@@ -609,15 +398,17 @@ public class BundleClassLoader extends ClassLoader {
                 .takeBrief("Scaning Class")
                 .build().toLogger();
 
-        for(Map.Entry<String,TypeFileMetadata> entry : totalFileMetadatas.entrySet()) {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}. It's key -> {1}.",
-                    entry.getValue().getFullClassNameWithoutSuffix(),entry.getKey())
-                    .aroundBundle(this.bundleName)
-                    .atLevel(LoggerLevel.Debug)
-                    .byCalled(this.getClass())
-                    .forSessionId("loadclass")
-                    .takeBrief("Scaning Class")
-                    .build().toLogger();
+        if(isPrintScanClasses) {
+            for(Map.Entry<String,TypeFileMetadata> entry : totalFileMetadatas.entrySet()) {
+                LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}. It's key -> {1}.",
+                        entry.getValue().getFullClassNameWithoutSuffix(),entry.getKey())
+                        .aroundBundle(this.bundleName)
+                        .atLevel(LoggerLevel.Debug)
+                        .byCalled(this.getClass())
+                        .forSessionId("loadclass")
+                        .takeBrief("Scaning Class")
+                        .build().toLogger();
+            }
         }
 
     }
@@ -627,7 +418,10 @@ public class BundleClassLoader extends ClassLoader {
      *
      */
     public void scanAllClass(BundleContext bctx) {
-        scanAllClass(bctx.getBinFolder(),bctx.getClassesFolder(),bctx.getLibFolder());
+        scanAllClass(bctx.getBinFolder(),
+                bctx.getClassesFolder(),
+                bctx.getLibFolder(),
+                bctx.isPrintScanClasses());
     }
 
     /**
