@@ -67,12 +67,12 @@ public class TypeFileMetadata {
         cfm.setParentFileName(parentFileName);
         if (fullFileName.endsWith(".class")) {
             cfm.setFullFileName(fullFileName);
-            String ffn = fullFileName.replace("/\\", ".");
+            String ffn = fullFileName.replace("/", ".").replace(File.separator, ".");
             cfm.setFullClassName(ffn);
             cfm.setFullClassNameWithoutSuffix(ffn.substring(0, fullFileName.lastIndexOf(".class")));
         } else {
             cfm.setFullFileName(fullFileName.concat(".class"));
-            String ffn = fullFileName.replace("\\/", ".");
+            String ffn = fullFileName.replace("/", ".").replace(File.separator, ".");
             cfm.setFullClassName(ffn.concat(".class"));
             cfm.setFullClassNameWithoutSuffix(ffn);
         }

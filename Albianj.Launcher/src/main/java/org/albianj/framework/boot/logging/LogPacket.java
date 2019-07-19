@@ -164,11 +164,11 @@ public class LogPacket {
 
         Thread rt = null == this.refThread ? Thread.currentThread() : this.refThread;
         String msg = StringServant.Instance.format(
-                "{0} [{1}] Session:[{2}] Bundle:[{3}] Thread:[{4},{5}] Brief:[{6}] Secret:[{7}] Msg:[{8}] {9}. {10}",
+                "{0} Bundle:[{1}] RefType:[{2}] Msg:[{3}] Brief:[{4}] Secret:[{5}] Session:[{6}] Level:[{7}] Thread:[{8},{9}] {10}.{11}",
                 DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
-                level.getTag(),sessionId,bundleName,
+                bundleName,refType.getName(),logMsg,brief,secretMsg,
+                sessionId,level.getTag(),
                 rt.getId(),rt.getName(),
-                brief,secretMsg,logMsg,
                 ThrowableServant.Instance.excp2LogMsg(cause,refType),
                 System.lineSeparator());
 

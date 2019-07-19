@@ -72,51 +72,46 @@ public class ThrowableServant {
         return StringServant.Instance.format("Type:[{0}] Msg:[{1}]",rc.getClass().getName(),rc.getMessage());
     }
 
-    /**
-     * 组合异常/指定发生异常时的堆栈信息
-     * 发生异常的调用点为clzz参数指定
-     * 当内部有异常时，clzz应为null，这样
-     * @param e
-     * @param refType
-     * @return
-     */
-    public String makeStackChainBuffer(Throwable e,Class<?> refType){
-        String callClassname = refType.getName();
-        if(null == e){
-            return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
-        }
-
-        StackTraceElement[] stes = e.getStackTrace();
-        StringBuilder sb = new StringBuilder();
-        for(StackTraceElement ste : stes){
-            if ((null != refType) && !ste.getClassName().equals(callClassname)) {
-                continue;
-            }
-            sb.append(ste.getClassName()).append(".").append(ste.getMethodName())
-                    .append("(")
-                    .append(ste.getFileName()).append(":").append(ste.getLineNumber())
-                    .append(") -> ");
-        }
-        int len = sb.length();
-        if(0 != len){
-            sb.delete(len -4,len);
-            return sb.toString();
-        }
-        return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
-    }
+//    /**
+//     * 组合异常/指定发生异常时的堆栈信息
+//     * 发生异常的调用点为clzz参数指定
+//     * 当内部有异常时，clzz应为null，这样
+//     * @param e
+//     * @param refType
+//     * @return
+//     */
+//    public String makeStackChainBuffer(Throwable e,Class<?> refType){
+//        String callClassname = refType.getName();
+//        if(null == e){
+//            return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
+//        }
+//
+//        StackTraceElement[] stes = e.getStackTrace();
+//        StringBuilder sb = new StringBuilder();
+//        for(StackTraceElement ste : stes){
+//            if ((null != refType) && !ste.getClassName().equals(callClassname)) {
+//                continue;
+//            }
+//            sb.append(ste.getClassName()).append(".").append(ste.getMethodName())
+//                    .append("(")
+//                    .append(ste.getFileName()).append(":").append(ste.getLineNumber())
+//                    .append(") -> ");
+//        }
+//        int len = sb.length();
+//        if(0 != len){
+//            sb.delete(len -4,len);
+//            return sb.toString();
+//        }
+//        return "Stack:[NULL]";
+//    }
 
     public String excp2LogMsg(Throwable e, Class<?> refType){
         String calledClassname = refType.getName();
         if(null == e) {
-            return StringServant.Instance.format("RefType:[{0}] Throwable:[NULL]",calledClassname);
+            return "Throwable:[NULL]";
         }
         Throwable t = null;
         String throwBuffer = null;
-//        if (e instanceof HiddenException) {
-//            HiddenException he = (HiddenException) e;
-//            throwBuffer = he.getLocalizedMessage();
-//          return throwBuffer;
-//        }
         if (e instanceof DisplayException) { // hidden exception is do this
             DisplayException de = (DisplayException) e;
             throwBuffer = de.getLocalizedMessage();
@@ -124,26 +119,9 @@ public class ThrowableServant {
         }
 
         throwBuffer = StringServant.Instance.format(
-                "SystemException -> RefType:[{0}] Msg:[{1}] Cause:[Type:[{2}],Msg:[{3}]] Stack:[{4}]",
-                calledClassname,e.getMessage(),e.getClass().getName(),findThrowCauseMsg(e),printThrowStackTrace(e));
+                "SystemException -> Msg:[{0}] Cause:[Type:[{1}],Msg:[{2}]] Stack:[{3}]",
+                e.getMessage(),e.getClass().getName(),findThrowCauseMsg(e),printThrowStackTrace(e));
         return throwBuffer;
-
-//        /**
-//         * has inner exception
-//         *
-//         */
-//        String innerThrowBuffer = null;
-//        if(null != t) {
-//            /**
-//             * not to recursion deal the throwable
-//             * because HideException or DisplayException must be throw once
-//             */
-//            innerThrowBuffer = StringServant.Instance.format(
-//                    "CallClass:[{0}] Msg:[{1}] Cause:[{2}] Stack:[{3}]",
-//                    calledClassname,t.getMessage(),makeCauseChainBuffer(t),printThrowStackTrace(t));
-//        }
-//        return StringServant.Instance.format("Throw:[{0}] InnerThrow:[{1}]",
-//                throwBuffer,innerThrowBuffer);
     }
 
     /**

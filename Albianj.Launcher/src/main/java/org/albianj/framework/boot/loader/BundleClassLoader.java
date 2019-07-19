@@ -470,11 +470,14 @@ public class BundleClassLoader extends ClassLoader {
             }
             if (f.isFile()) {
                 try {
-                    String relFileName = getRelPath(f.getAbsolutePath(), rootFinder);
-                    if (map.containsKey(relFileName)) {
+                    String fullFilename = f.getAbsolutePath();
+                    String relFileName = fullFilename.substring(rootFinder.length()+ 1);
+                    String classname = relFileName.substring(0,relFileName.lastIndexOf("."))
+                            .replace("/",".").replace(File.separator,".");
+                    if (map.containsKey(classname)) {
                         continue;
                     }
-                    byte[] bytes = FileServant.Instance.getFileBytes(relFileName);
+                    byte[] bytes = FileServant.Instance.getFileBytes(fullFilename);
                     /**
                      * scan file not like jarfile so it can define class in the method
                      * scan a folder for classes just only happend at begin and use classes folde,
@@ -594,8 +597,17 @@ public class BundleClassLoader extends ClassLoader {
                     .forSessionId("loadclass")
                     .takeBrief("Scaning Class")
                     .build().toLogger();
-            scanClassesFile("classpath",root.getName(), root.getName(), totalFileMetadatas);
+            scanClassesFile("classpath",root.getAbsolutePath(), root.getAbsolutePath(), totalFileMetadatas);
         }
+
+        LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class Count-> {0}.",
+                totalFileMetadatas.size())
+                .aroundBundle(this.bundleName)
+                .atLevel(LoggerLevel.Debug)
+                .byCalled(this.getClass())
+                .forSessionId("loadclass")
+                .takeBrief("Scaning Class")
+                .build().toLogger();
 
         for(Map.Entry<String,TypeFileMetadata> entry : totalFileMetadatas.entrySet()) {
             LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}. It's key -> {1}.",
