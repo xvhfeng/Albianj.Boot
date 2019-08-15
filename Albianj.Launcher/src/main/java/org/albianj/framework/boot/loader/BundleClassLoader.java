@@ -1,23 +1,17 @@
 package org.albianj.framework.boot.loader;
 
 import org.albianj.framework.boot.BundleContext;
+import org.albianj.framework.boot.loader.typemd.TypeDiredTree;
 import org.albianj.framework.boot.logging.LogServant;
 import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.servants.FileServant;
-import org.albianj.framework.boot.servants.RefArg;
 import org.albianj.framework.boot.servants.StringServant;
 import org.albianj.framework.boot.servants.TypeServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -58,15 +52,17 @@ public class BundleClassLoader extends ClassLoader {
      * value - class file metadata
      */
 
-    protected Map<String,TypeFileMetadata> totalFileMetadatas = null;
+//    protected Map<String,TypeFileMetadata> totalFileMetadatas = null;
+    protected TypeDiredTree typeDiredTree = null;
     protected Set<String> jarFileSet = null;
 
     protected BundleClassLoader(String bundleName) {
-        super();
-        this.parent = Thread.currentThread().getContextClassLoader();
+        super(BundleClassLoader.class.getClassLoader());
+        this.parent = BundleClassLoader.class.getClassLoader();//Thread.currentThread().getContextClassLoader();
         this.bundleName = bundleName;
-        totalFileMetadatas = new HashMap<>();
+//        totalFileMetadatas = new HashMap<>();
         jarFileSet = new HashSet<>();
+        typeDiredTree = new TypeDiredTree();
     }
 
     public static BundleClassLoader newInstance(String bundleName) {
@@ -77,7 +73,7 @@ public class BundleClassLoader extends ClassLoader {
         return this.bundleName;
     }
 
-    public synchronized Class<?> loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} ready to load.",name)
                 .aroundBundle(this.bundleName)
                 .atLevel(LoggerLevel.Debug)
@@ -85,17 +81,18 @@ public class BundleClassLoader extends ClassLoader {
                 .byCalled(this.getClass())
                 .takeBrief("Loading Class")
                 .build().toLogger();
+        if(name.equals("com.mysql.jdbc.LocalizedErrorMessages_zh")) {
+            return null;
+        }
         return loadClass(name, false);
     }
 
-    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    @Override
+    protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
         Class clzz = null;
         clzz = findLoadedClass(name);
         if (clzz != null) {
-            if (resolve) {
-                resolveClass(clzz);
-            }
-            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was found by loaded.",name)
+            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was found by loaded.", name)
                     .aroundBundle(this.bundleName)
                     .atLevel(LoggerLevel.Debug)
                     .forSessionId("loadclass")
@@ -109,7 +106,8 @@ public class BundleClassLoader extends ClassLoader {
          * loader must loading by app or extloader
          */
         if (!name.startsWith("org.albianj.framework.boot")) {
-            if (totalFileMetadatas.containsKey(name)) {
+//            if (totalFileMetadatas.containsKey(name)) {
+            if(null != typeDiredTree.findNode(name)) {
                 clzz = loadClassFromTypeMetadata(name);
             }
 
@@ -120,7 +118,7 @@ public class BundleClassLoader extends ClassLoader {
 
         //system java class loading by app loader or sys loader
         try {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader.",name)
+            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader.", name)
                     .aroundBundle(this.bundleName)
                     .atLevel(LoggerLevel.Debug)
                     .byCalled(this.getClass())
@@ -129,16 +127,35 @@ public class BundleClassLoader extends ClassLoader {
                     .build().toLogger();
 
             //AppClassLoader
-
-            ClassLoader loader =  this.parent;
-            clzz = loader.loadClass(name);
+            clzz = this.getParent().loadClass(name);
             if (clzz != null) {
-                if (resolve)
-                    resolveClass(clzz);
                 return (clzz);
             }
         } catch (ClassNotFoundException e) {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.",name)
+            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .withCause(e)
+                    .forSessionId("loadclass")
+                    .takeBrief("Loading Class")
+                    .build().toLogger();
+        }
+
+        try {
+            String fileName = name.substring(name.lastIndexOf(".") + 1) + ".class";
+            InputStream is = getClass().getResourceAsStream(fileName);
+            if (is == null) {
+                throw new ClassNotFoundException(name);
+            }
+            byte[] b = new byte[is.available()];
+            is.read(b);
+            clzz =  defineClass(name, b, 0, b.length);
+            if(null == clzz) {
+                throw new ClassNotFoundException(name);
+            }
+        } catch (Exception e) {
+            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
                     .aroundBundle(this.bundleName)
                     .atLevel(LoggerLevel.Error)
                     .byCalled(this.getClass())
@@ -148,26 +165,83 @@ public class BundleClassLoader extends ClassLoader {
                     .takeBrief("Loading Class")
                     .build().toLogger();
         }
-
-//        Class<?> clzz = null;
-//        try {
-//             clzz = this.findClass(name);
-//        }catch (Exception  e){
-//            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} by findClass in BundleClassLoder,but loading fail.",name)
-//                    .aroundBundle(this.bundleName)
-//                    .atLevel(LoggerLevel.Error)
-//                    .byCalled(this.getClass())
-//                    .alwaysThrow(true)
-//                    .withCause(e)
-//                    .forSessionId("loadclass")
-//                    .takeBrief("Loading Class")
-//                    .build().toLogger();
-//        }
         return clzz;
     }
 
+
+//    @Override
+//    public URL getResource(String name) {
+//        URL url = super.getResource(name);
+//        LogServant.Instance.newLogPacketBuilder().addMessage("find resource -> {0} bu url -> {1}",
+//                name,url)
+//                .aroundBundle(this.bundleName)
+//                .atLevel(LoggerLevel.Debug)
+//                .forSessionId("LoadResource")
+//                .byCalled(this.getClass())
+//                .takeBrief("Loading Resource By Scan Jar")
+//                .build().toLogger();
+//        return url;
+//    }
+
+    @Override
+    protected URL findResource(String name) {
+        LogServant.Instance.newLogPacketBuilder().addMessage("find resource -> {0}",
+                name)
+                .aroundBundle(this.bundleName)
+                .atLevel(LoggerLevel.Debug)
+                .forSessionId("LoadResource")
+                .byCalled(this.getClass())
+                .takeBrief("Loading Resource By Scan Jar")
+                .build().toLogger();
+
+        URL url = super.findResource(name);
+        if(null != url) {
+            return url;
+        }
+
+        String className  = name.substring(0,name.lastIndexOf("."));
+        className = className.replace("/",".");
+
+        TypeFileMetadata cfm = typeDiredTree.findNode(className);
+        if(null == cfm) {
+            LogServant.Instance.newLogPacketBuilder().addMessage(
+                    "Not Found resource -> {0} with className -> {1}.",
+                    name,className)
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Debug)
+                    .forSessionId("LoadResource")
+                    .byCalled(this.getClass())
+                    .takeBrief("Found Resource")
+                    .build().toLogger();
+            return null;
+        }
+        url = cfm.makeFileURL();
+        if(null != url){
+            LogServant.Instance.newLogPacketBuilder().addMessage(
+                    "find resource -> {0} with className -> {2} URL ->{1}",
+                    name,url.toString(),className)
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Debug)
+                    .forSessionId("LoadResource")
+                    .byCalled(this.getClass())
+                    .takeBrief("Found Resource")
+                    .build().toLogger();
+        } else {
+            LogServant.Instance.newLogPacketBuilder().addMessage("find resource -> {0} with className -> {1} not url is NULL",
+                    name,className)
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Debug)
+                    .forSessionId("LoadResource")
+                    .byCalled(this.getClass())
+                    .takeBrief("Found Resource")
+                    .build().toLogger();
+        }
+        return url;
+    }
+
+
     protected Class<?> loadClassFromTypeMetadata(String name) {
-        TypeFileMetadata cfm = totalFileMetadatas.get(name);
+        TypeFileMetadata cfm = typeDiredTree.findNode(name); //totalFileMetadatas.get(name);
         Class<?> clzz = null;
         if (cfm == null) {
 
@@ -238,7 +312,7 @@ public class BundleClassLoader extends ClassLoader {
         return clzz;
     }
 
-    public void scanClassesFile(String fromFolder,String rootFinder, String currFinder, Map<String, TypeFileMetadata> map) {
+    public void scanClassesFile(String fromFolder,String rootFinder, String currFinder,  TypeDiredTree typeDiredTree) {
         File finder = new File(currFinder);
         if (!finder.exists()) {
             return;
@@ -255,7 +329,7 @@ public class BundleClassLoader extends ClassLoader {
         }
         for (File f : files) {
             if (f.isDirectory()) {
-                scanClassesFile(fromFolder,rootFinder, f.getAbsolutePath(), map);
+                scanClassesFile(fromFolder,rootFinder, f.getAbsolutePath(), typeDiredTree);
             }
             if (f.isFile()) {
                 try {
@@ -263,20 +337,35 @@ public class BundleClassLoader extends ClassLoader {
                     String relFileName = fullFilename.substring(rootFinder.length()+ 1);
                     String classname = relFileName.substring(0,relFileName.lastIndexOf("."))
                             .replace("/",".").replace(File.separator,".");
-                    if (map.containsKey(classname)) {
+                    if (null != typeDiredTree.findNode(classname)) {
                         continue;
                     }
                     byte[] bytes = FileServant.Instance.getFileBytes(fullFilename);
+
+
                     /**
                      * scan file not like jarfile so it can define class in the method
                      * scan a folder for classes just only happend at begin and use classes folde,
                      * it never use for scan all classes not loaded by app classloader
                      *
                      */
-//                    Class<?> cla = defineClass(f.getAbsolutePath(), bytes, 0, bytes.length);
-                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
+
+                    if (relFileName.endsWith(".class")) {
+                        TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Class,".class",relFileName, bytes, rootFinder, false,fromFolder);
+                        typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
+                    }
+                    if(relFileName.endsWith(".properties")) {
+                        TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".properties",relFileName, bytes, rootFinder, false,fromFolder);
+                        typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
+                    }
+                    if(relFileName.endsWith(".dtd")) {
+                        TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".dtd",relFileName, bytes, rootFinder, false,fromFolder);
+                        typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
+                    }
+
+//                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
 //                    cfm.setType(cla);
-                    map.put(cfm.mkKey(), cfm);
+//                    typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
                 } catch (Exception e) {
 
                 }
@@ -284,7 +373,15 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    public void scanJarFolder(String fromFolder,String jarFinder, Map<String, TypeFileMetadata> map) {
+    public void scanJarFolder(String fromFolder,String jarFinder,  TypeDiredTree typeDiredTree) {
+        LogServant.Instance.newLogPacketBuilder().addMessage("Scan jar folder -> {0}",jarFinder)
+                .aroundBundle(this.bundleName)
+                .atLevel(LoggerLevel.Debug)
+                .forSessionId("loadclass")
+                .byCalled(this.getClass())
+                .takeBrief("Loading Class By Scan Jar")
+                .build().toLogger();
+
         File finder = new File(jarFinder);
         if (!finder.exists()) {
             return;
@@ -301,11 +398,11 @@ public class BundleClassLoader extends ClassLoader {
         }
         for (File f : files) {
             if (f.isDirectory()) {
-                scanJarFolder(fromFolder,jarFinder, map);
+                scanJarFolder(fromFolder,f.getAbsolutePath(), typeDiredTree);
             }
             if (f.isFile()) {
                 try {
-                    scanJarFile(fromFolder,f.getAbsolutePath(), map);
+                    scanJarFile(fromFolder,f.getAbsolutePath(), typeDiredTree);
                 } catch (Exception e) {
 
                 }
@@ -313,14 +410,14 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    public void scanJarFile(String fromFolder,String jarFile, Map<String, TypeFileMetadata> map) {
+    public void scanJarFile(String fromFolder,String jarFile,  TypeDiredTree typeDiredTree) {
         if (jarFileSet.contains(jarFile)) {
             return;
         }
         JarInputStream jis = null;
         try {
             jis = new JarInputStream(new FileInputStream(jarFile));
-            sacnSingleJarBytes(fromFolder, jarFile, map, jis);
+            sacnSingleJarBytes(fromFolder, jarFile, typeDiredTree, jis);
             jarFileSet.add(jarFile);
         } catch (Exception e) {
 
@@ -334,18 +431,29 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    protected void sacnSingleJarBytes(String fromFolder, String jarFile, Map<String, TypeFileMetadata> map, JarInputStream jis) throws IOException {
+    protected void sacnSingleJarBytes(String fromFolder, String jarFile,  TypeDiredTree typeDiredTree, JarInputStream jis) throws IOException {
         JarEntry entry = null;
         while (null != (entry = jis.getNextJarEntry())) {
             String name = entry.getName();
+            String className = name.replace("/",".");
+            if (null != typeDiredTree.findNode(className)) {
+                continue;
+            }
+
             if (name.endsWith(".class")) {
-                if (map.containsKey(name)) {
-                    continue;
-                }
                 byte[] bytes = TypeServant.Instance.readJarBytes(jis);
-                name = name.replace("/",".");
-                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true,fromFolder);
-                map.put(cfm.mkKey(), cfm);
+                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Class,".class",name, bytes, jarFile, true,fromFolder);
+                typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
+            }
+            if(name.endsWith(".properties")) {
+                byte[] bytes = TypeServant.Instance.readJarBytes(jis);
+                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".properties",name, bytes, jarFile, true,fromFolder);
+                typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
+            }
+            if(name.endsWith(".dtd")) {
+                byte[] bytes = TypeServant.Instance.readJarBytes(jis);
+                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".dtd",name, bytes, jarFile, true,fromFolder);
+                typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
             }
         }
     }
@@ -372,25 +480,12 @@ public class BundleClassLoader extends ClassLoader {
         /**
          * because load priority,so  low priority loading before high priority
          */
-        scanJarFolder("lib",libFolder, totalFileMetadatas);
-        scanClassesFile("classes",classesFolder, classesFolder, totalFileMetadatas);
-        scanJarFolder("bin",binFolder, totalFileMetadatas);
-        String classpath = this.parent.getResource("").getPath();
-        if(StringServant.Instance.isNotNullAndNotEmptyAndNotAllSpace(classpath)) {
-            File root = new File(classpath);
-            LogServant.Instance.newLogPacketBuilder().addMessage("Scan Class in classpath -> {0}.",
-                    root.getName())
-                    .aroundBundle(this.bundleName)
-                    .atLevel(LoggerLevel.Debug)
-                    .byCalled(this.getClass())
-                    .forSessionId("loadclass")
-                    .takeBrief("Scaning Class")
-                    .build().toLogger();
-            scanClassesFile("classpath",root.getAbsolutePath(), root.getAbsolutePath(), totalFileMetadatas);
-        }
+        scanJarFolder("lib",libFolder, typeDiredTree);
+        scanClassesFile("classes",classesFolder, classesFolder, typeDiredTree);
+        scanJarFolder("bin",binFolder, typeDiredTree);
 
         LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class Count-> {0}.",
-                totalFileMetadatas.size())
+                typeDiredTree.getSize())
                 .aroundBundle(this.bundleName)
                 .atLevel(LoggerLevel.Debug)
                 .byCalled(this.getClass())
@@ -399,7 +494,8 @@ public class BundleClassLoader extends ClassLoader {
                 .build().toLogger();
 
         if(isPrintScanClasses) {
-            for(Map.Entry<String,TypeFileMetadata> entry : totalFileMetadatas.entrySet()) {
+            Map<String,TypeFileMetadata> map = this.typeDiredTree.findChildNodes("",true);
+            for(Map.Entry<String, TypeFileMetadata> entry :map.entrySet()) {
                 LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class -> {0}. It's key -> {1}.",
                         entry.getValue().getFullClassNameWithoutSuffix(),entry.getKey())
                         .aroundBundle(this.bundleName)
@@ -410,7 +506,6 @@ public class BundleClassLoader extends ClassLoader {
                         .build().toLogger();
             }
         }
-
     }
 
     /**
@@ -425,68 +520,78 @@ public class BundleClassLoader extends ClassLoader {
     }
 
     /**
+     * 得到子文件
+     * 当isOnlyFileEntry为true的时候，只返回文件，为false的时候，叶子节点为node（即空文件夹)也返回
+     * @param path
+     * @return
+     */
+    public Map<String,TypeFileMetadata> findChildFileEntries(String path) {
+        return this.typeDiredTree.findChildNodes(path,true);
+    }
+
+    /**
      * 按照主从合并类元素，
      * @param map
      * @param isReplaceIfExist，当为true，参数map为master，其将替换原total中的类（如果有的话)
      */
     protected void mergerTypeFileMetadata(Map<String,TypeFileMetadata> map,boolean isReplaceIfExist){
-        if(isReplaceIfExist) {
-            this.totalFileMetadatas.putAll(map);
-        } else {
-            map.putAll(this.totalFileMetadatas);
-            this.totalFileMetadatas = map;
-        }
+//        if(isReplaceIfExist) {
+           this.typeDiredTree.addNodes(map);
+//        } else {
+//            map.putAll(this.totalFileMetadatas);
+//            this.totalFileMetadatas = map;
+//        }
     }
-
-    /**
-     * 根据指定的Anno来获取所有的class，不包括抽象类与接口
-     * @param markAnno 被标记的Tag
-     * @param unmarkAnno 未被标记的Tag
-     * @return
-     */
-    public Map<String,TypeFileMetadata> findNormalTypeWithAnno(Class<? extends Annotation> markAnno,Class<? extends Annotation> unmarkAnno){
-        Map<String,TypeFileMetadata> map = new HashMap<>();
-        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,totalFileMetadatas,map);
-        return map;
-    }
-
-    /**
-     * 根据指定的parent类/接口获取所有的普通class，不包括抽象子类与子接口
-     * @param parent
-     * @return
-     */
-    public Map<String,TypeFileMetadata> findNormalTypeWithParent(Class<?> parent){
-        Map<String,TypeFileMetadata> map = new HashMap<>();
-        findNormalTypeWithParentAndAnno(parent,null,null,totalFileMetadatas,map);
-        return map;
-    }
-
-    public void findNormalTypeWithParentAndAnno(Class<?> parent,
-                                             Class<? extends Annotation> markAnno,
-                                             Class<? extends Annotation> unmarkAnno,
-                                             Map<String,TypeFileMetadata> from,
-                                             Map<String,TypeFileMetadata> to) {
-        for(Map.Entry<String,TypeFileMetadata> entry : from.entrySet()){
-            TypeFileMetadata tfm = entry.getValue();
-            Class<?> clzz = tfm.getType();
-
-            /**
-             * is normal class
-             * and mark by markAnno
-             * and not mark by unmarkAnno
-             * and not in result
-             */
-            boolean isConform = TypeServant.Instance.isNormalClass(clzz)
-                    && ((null == parent) ? true :  tfm.getType().isAssignableFrom(parent))
-                    && ((null == markAnno) ? true : clzz.isAnnotationPresent(markAnno))
-                    && ((null == unmarkAnno) ? true :  !clzz.isAnnotationPresent(unmarkAnno))
-                    && (!to.containsKey(tfm.mkKey()));
-            if(isConform){
-                to.put(tfm.mkKey(), tfm);
-            }
-        }
-    }
-
+//
+//    /**
+//     * 根据指定的Anno来获取所有的class，不包括抽象类与接口
+//     * @param markAnno 被标记的Tag
+//     * @param unmarkAnno 未被标记的Tag
+//     * @return
+//     */
+//    public Map<String,TypeFileMetadata> findNormalTypeWithAnno(Class<? extends Annotation> markAnno,Class<? extends Annotation> unmarkAnno){
+//        Map<String,TypeFileMetadata> map = new HashMap<>();
+//        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,totalFileMetadatas,map);
+//        return map;
+//    }
+//
+//    /**
+//     * 根据指定的parent类/接口获取所有的普通class，不包括抽象子类与子接口
+//     * @param parent
+//     * @return
+//     */
+//    public Map<String,TypeFileMetadata> findNormalTypeWithParent(Class<?> parent){
+//        Map<String,TypeFileMetadata> map = new HashMap<>();
+//        findNormalTypeWithParentAndAnno(parent,null,null,totalFileMetadatas,map);
+//        return map;
+//    }
+//
+//    public void findNormalTypeWithParentAndAnno(Class<?> parent,
+//                                             Class<? extends Annotation> markAnno,
+//                                             Class<? extends Annotation> unmarkAnno,
+//                                             Map<String,TypeFileMetadata> from,
+//                                             Map<String,TypeFileMetadata> to) {
+//        for(Map.Entry<String,TypeFileMetadata> entry : from.entrySet()){
+//            TypeFileMetadata tfm = entry.getValue();
+//            Class<?> clzz = tfm.getType();
+//
+//            /**
+//             * is normal class
+//             * and mark by markAnno
+//             * and not mark by unmarkAnno
+//             * and not in result
+//             */
+//            boolean isConform = TypeServant.Instance.isNormalClass(clzz)
+//                    && ((null == parent) ? true :  tfm.getType().isAssignableFrom(parent))
+//                    && ((null == markAnno) ? true : clzz.isAnnotationPresent(markAnno))
+//                    && ((null == unmarkAnno) ? true :  !clzz.isAnnotationPresent(unmarkAnno))
+//                    && (!to.containsKey(tfm.mkKey()));
+//            if(isConform){
+//                to.put(tfm.mkKey(), tfm);
+//            }
+//        }
+//    }
+//
 
 
 

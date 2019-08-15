@@ -144,27 +144,27 @@ public class BundleContext {
 
     public String getBinFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.binFolder)
-         ? workPath + "bin" + File.pathSeparator : this.binFolder;
+         ? workPath + "bin" + File.separator : this.binFolder;
     }
 
     public String getLibFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.libFolder)
-                ? workPath + "lib" + File.pathSeparator : this.libFolder;
+                ? workPath + "lib" + File.separator : this.libFolder;
     }
 
     public String getClassesFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.classesFolder)
-                ? workPath + "classes" + File.pathSeparator : this.classesFolder;
+                ? workPath + "classes" + File.separator : this.classesFolder;
     }
 
     public String getConfFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.confFolder)
-                ? workPath + "config" + File.pathSeparator : this.confFolder;
+                ? workPath + "config" + File.separator : this.confFolder;
     }
 
     public String getAppsFolder() {
         return StringServant.Instance.isNullOrEmptyOrAllSpace(this.appsFolder)
-                ? workPath + "apps" + File.pathSeparator : this.appsFolder;
+                ? workPath + "apps" + File.separator : this.appsFolder;
     }
 
     public String getBundleName() {
@@ -203,6 +203,11 @@ public class BundleContext {
         return this.isPrintScanClasses;
     }
 
+    public BundleContext setPrintScanClasses(boolean isPrintScanClasses ){
+        this.isPrintScanClasses = isPrintScanClasses;
+        return this;
+    }
+
     public BundleContext setArgs(String[] args) {
         this.args = args;
         return this;
@@ -215,13 +220,13 @@ public class BundleContext {
                 .byCalled(this.getClass())
                 .takeBrief("Bundle Runtime Settings")
                 .addMessage("Application startup at bin folder -> {0},lib folder -> {1},classes folder -> {2},conf folder -> {3},apps folder -> {4}.",
-                        this.binFolder,this,libFolder,this.classesFolder,this.confFolder,this.appsFolder)
+                        getBinFolder(),getLibFolder(),getClassesFolder(),getConfFolder(),getAppsFolder())
                 .build().toLogger();
 
 
         this.phase = Phase.Run;
         if(null != this.beginStartupEvent) {
-            this.beginRunEvent.onActionExecute(this);
+            this.beginStartupEvent.onActionExecute(this);
         }
         BundleThread thread = null;
         final BundleContext bctx = this;
@@ -233,6 +238,7 @@ public class BundleContext {
                     String startupTypeName = bctx.getStartupClassName();
                     try {
                         BundleClassLoader loader = (BundleClassLoader) bctx.getClassLoader();
+                        Thread.currentThread().setContextClassLoader(loader);
                         loader.scanAllClass(bctx);
                         Class<?> clzz = loader.loadClass(startupTypeName);
                         Object launcher =  clzz.newInstance();

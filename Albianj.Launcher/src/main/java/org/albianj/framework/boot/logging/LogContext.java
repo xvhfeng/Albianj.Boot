@@ -15,6 +15,7 @@ public class LogContext {
     private LoggerLevel level = LoggerLevel.All;
     private volatile boolean isStopAccept = false;
     private LoggerConf logConf;
+    private volatile long  debugIdx = 0;
 
     public LogContext(LoggerConf logConf) {
         this.logConf = logConf;
@@ -28,13 +29,13 @@ public class LogContext {
 
         synchronized (this) {
             if (isStopAccept) return;
+            packet.setDebugIdx(debugIdx++);
             cq.add(packet);
         }
     }
 
     public void flush(boolean isStopAccept) {
         ArrayList<LogPacket> q = null;
-
         synchronized (this) {
             this.isStopAccept = isStopAccept;
             q = cq;
@@ -48,7 +49,12 @@ public class LogContext {
         }
 
         if(isStopAccept && !cq.isEmpty()) {
-            q.addAll(cq);
+            /**
+             * last log queue not flush to logfile
+             * and the last queue is before accepting-queue
+             * so insert begin of the logging-queue
+             */
+            q.addAll(0,cq);
         }
 
         if (q.isEmpty()) {

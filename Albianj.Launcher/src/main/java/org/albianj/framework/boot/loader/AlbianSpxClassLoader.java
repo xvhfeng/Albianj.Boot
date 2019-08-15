@@ -38,11 +38,13 @@ Copyright (c) 2016 著作权由上海阅文信息技术有限公司所有。著�
 package org.albianj.framework.boot.loader;
 
 import org.albianj.framework.boot.BundleContext;
+import org.albianj.framework.boot.loader.typemd.TypeDiredTree;
 import org.albianj.framework.boot.servants.CollectServant;
 import org.albianj.framework.boot.servants.ConvertServant;
 import org.albianj.framework.boot.servants.FileServant;
 import org.albianj.framework.boot.logging.LogServant;
 import org.albianj.framework.boot.logging.LoggerLevel;
+import org.albianj.framework.boot.servants.TypeServant;
 import org.albianj.framework.boot.tags.BundleSharingTag;
 
 import java.io.ByteArrayInputStream;
@@ -53,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 @BundleSharingTag
@@ -278,4 +281,35 @@ public class AlbianSpxClassLoader extends BundleClassLoader {
             }
         }
     }
+    protected void sacnSingleJarBytes(String fromFolder, String jarFile,  Map<String, TypeFileMetadata> map, JarInputStream jis) throws IOException {
+        JarEntry entry = null;
+        while (null != (entry = jis.getNextJarEntry())) {
+            String name = entry.getName();
+            String className = name.replace("/",".");
+            if (name.endsWith(".class")) {
+                if (map.containsKey(className)) {
+                    continue;
+                }
+                byte[] bytes = TypeServant.Instance.readJarBytes(jis);
+
+                if (name.endsWith(".class")) {
+                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Class,".class",name, bytes, jarFile, true,fromFolder);
+                    map.put(cfm.mkKey(),cfm);
+                }
+                if(name.endsWith(".properties")) {
+                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".properties",name, bytes, jarFile, true,fromFolder);
+                    map.put(cfm.mkKey(),cfm);
+                }
+                if(name.endsWith(".dtd")) {
+                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".dtd",name, bytes, jarFile, true,fromFolder);
+                    map.put(cfm.mkKey(),cfm);
+                }
+
+//                name = name.replace("/",".");
+//                TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(name, bytes, jarFile, true,fromFolder);
+//                map.put(cfm.mkKey(),cfm);
+            }
+        }
+    }
+
 }

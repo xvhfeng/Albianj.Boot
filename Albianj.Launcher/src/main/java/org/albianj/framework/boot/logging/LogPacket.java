@@ -35,6 +35,7 @@ public class LogPacket {
     private String sessionId;
     private String bundleName;
     private Thread refThread;
+    private long  debugIdx = 0;
 
     public LogPacket(){
         this.datetimeMS = System.currentTimeMillis();
@@ -145,6 +146,14 @@ public class LogPacket {
         ThrowableServant.Instance.throwDisplayException(refType,cause, brief, logMsg);
     }
 
+    public long getDebugIdx() {
+        return debugIdx;
+    }
+
+    public void setDebugIdx(long debugIdx) {
+        this.debugIdx = debugIdx;
+    }
+
     /**
      * 记录到Runtimes的日志
      */
@@ -164,13 +173,14 @@ public class LogPacket {
 
         Thread rt = null == this.refThread ? Thread.currentThread() : this.refThread;
         String msg = StringServant.Instance.format(
-                "{0} Bundle:[{1}] RefType:[{2}] Msg:[{3}] Brief:[{4}] Secret:[{5}] Session:[{6}] Level:[{7}] Thread:[{8},{9}] {10}.{11}",
+                "{12} {0} Bundle:[{1}] RefType:[{2}] Msg:[{3}] Brief:[{4}] Secret:[{5}] Session:[{6}] Level:[{7}] Thread:[{8},{9}] {10}.{11}",
                 DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
                 bundleName,refType.getName(),logMsg,brief,secretMsg,
                 sessionId,level.getTag(),
                 rt.getId(),rt.getName(),
                 ThrowableServant.Instance.excp2LogMsg(cause,refType),
-                System.lineSeparator());
+                System.lineSeparator(),
+                this.debugIdx);
 
         return msg;
     }

@@ -1,9 +1,14 @@
 package org.albianj.framework.boot.loader;
 
+import org.albianj.framework.boot.logging.LogServant;
+import org.albianj.framework.boot.logging.LoggerLevel;
 import org.albianj.framework.boot.tags.BundleSharingTag;
+import sun.font.SunFontManager;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -54,31 +59,45 @@ public class TypeFileMetadata {
     private String fromFolder;
 
     /**
+     * 后缀的名称，包括后缀的.
+     */
+    private String suffixName;
+
+    private TypeFileOpt fileOpt;
+
+    /**
      * @param fullFileName     带有.class后缀名和命名空间的完全文件名,文件系统格式
      * @param fileContentBytes 文件内容
      * @param parentFileName   class归属的parent名字 可能为目录名或者是jar
      * @param isParentJar      归属是目录还是jar
      * @return
      */
-    public static TypeFileMetadata makeClassFileMetadata(String fullFileName, byte[] fileContentBytes, String parentFileName, boolean isParentJar,String fromFolder) {
+    public static TypeFileMetadata makeClassFileMetadata( TypeFileOpt fileOpt,
+                                                          String suffixName,
+                                                          String fullFileName,
+                                                         byte[] fileContentBytes,
+                                                         String parentFileName,
+                                                         boolean isParentJar,
+                                                         String fromFolder) {
         TypeFileMetadata cfm = new TypeFileMetadata();
         cfm.setFileContentBytes(fileContentBytes);
         cfm.setParentJar(isParentJar);
         cfm.setParentFileName(parentFileName);
-        if (fullFileName.endsWith(".class")) {
-            cfm.setFullFileName(fullFileName);
-            String ffn = fullFileName.replace("/", ".").replace(File.separator, ".");
-            cfm.setFullClassName(ffn);
-            cfm.setFullClassNameWithoutSuffix(ffn.substring(0, fullFileName.lastIndexOf(".class")));
-        } else {
-            cfm.setFullFileName(fullFileName.concat(".class"));
-            String ffn = fullFileName.replace("/", ".").replace(File.separator, ".");
-            cfm.setFullClassName(ffn.concat(".class"));
-            cfm.setFullClassNameWithoutSuffix(ffn);
-        }
+        cfm.setSuffixName(suffixName);
+        cfm.setFileOpt(fileOpt);
         String md5 = md5(fileContentBytes);
         cfm.setMd5(md5);
         cfm.fromFolder = fromFolder;
+        cfm.setFullFileName(fullFileName);
+        String ffn = fullFileName.replace("/", ".").replace(File.separator, ".");
+        cfm.setFullClassName(ffn);
+
+        if (fullFileName.endsWith(suffixName)) {
+            cfm.setFullClassNameWithoutSuffix(ffn.substring(0, fullFileName.lastIndexOf(suffixName)));
+        } else {
+            cfm.setFullClassNameWithoutSuffix(ffn);
+        }
+
         return cfm;
     }
 
@@ -173,5 +192,58 @@ public class TypeFileMetadata {
 
     public String mkKey(){
         return this.fullClassNameWithoutSuffix;
+    }
+
+    public String getSuffixName() {
+        return suffixName;
+    }
+
+    public void setSuffixName(String suffixName) {
+        this.suffixName = suffixName;
+    }
+
+    public TypeFileOpt getFileOpt() {
+        return fileOpt;
+    }
+
+    public void setFileOpt(TypeFileOpt fileOpt) {
+        this.fileOpt = fileOpt;
+    }
+
+    public URL makeFileURL(){
+        StringBuffer sb = new StringBuffer();
+        if(isParentJar) {
+            sb.append("jar:file:/");
+            sb.append(parentFileName.replace("\\","/"))
+                    .append("!/").append(fullFileName);
+        } else {
+            sb.append("file:/");
+            sb.append(parentFileName.replace("\\","/"))
+                    .append("!/").append(fullFileName);
+        }
+        String url = sb.toString();
+        LogServant.Instance.newLogPacketBuilder().addMessage(
+                "make resurce url -> {0}",
+                url)
+                .atLevel(LoggerLevel.Debug)
+                .forSessionId("LoadResource")
+                .byCalled(this.getClass())
+                .takeBrief("Make Resource URL")
+                .build().toLogger();
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            LogServant.Instance.newLogPacketBuilder().addMessage(
+                    "make resurce url -> {0} was throw excp.",
+                    url)
+                    .atLevel(LoggerLevel.Debug)
+                    .forSessionId("LoadResource")
+                    .byCalled(this.getClass())
+                    .withCause(e)
+                    .takeBrief("Make Resource URL")
+                    .build().toLogger();
+
+           return null;
+        }
     }
 }
