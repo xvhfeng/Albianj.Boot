@@ -34,6 +34,7 @@ public class BundleContext {
     private Phase phase;
     private String[] args;
     private boolean isPrintScanClasses = false;
+    private boolean isFilterNotExistTypeThrow = true;
 
     public BundleContext setBundleName(String name){
         this.bundleName = name;
@@ -95,6 +96,15 @@ public class BundleContext {
         return this;
     }
 
+    public boolean isFilterNotExistTypeThrow() {
+        return isFilterNotExistTypeThrow;
+    }
+
+    public BundleContext setFilterNotExistTypeThrow(boolean filterNotExistTypeThrow) {
+        isFilterNotExistTypeThrow = filterNotExistTypeThrow;
+        return this;
+    }
+
     /**
      * 是否加载spx文件，对于v1.*的albianj，请设置该选项
      * @param enable
@@ -108,8 +118,8 @@ public class BundleContext {
     public BundleContext build(){
         if(null == this.classLoader) {
             BundleClassLoader classLoader = isInstallSpxFile
-                    ?  AlbianSpxClassLoader.newInstance(bundleName)
-                    : BundleClassLoader.newInstance(bundleName);
+                    ?  AlbianSpxClassLoader.newInstance(bundleName,isFilterNotExistTypeThrow)
+                    : BundleClassLoader.newInstance(bundleName,isFilterNotExistTypeThrow);
 
             this.classLoader = classLoader;
         }

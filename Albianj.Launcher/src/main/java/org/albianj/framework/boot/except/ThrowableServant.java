@@ -69,41 +69,8 @@ public class ThrowableServant {
         while(null != (ptr = rc.getCause())) {
             rc = ptr;
         }
-        return StringServant.Instance.format("Type:[{0}] Msg:[{1}]",rc.getClass().getName(),rc.getMessage());
+        return StringServant.Instance.format("{0} -> {1}",rc.getClass().getName(),rc.getMessage());
     }
-
-//    /**
-//     * 组合异常/指定发生异常时的堆栈信息
-//     * 发生异常的调用点为clzz参数指定
-//     * 当内部有异常时，clzz应为null，这样
-//     * @param e
-//     * @param refType
-//     * @return
-//     */
-//    public String makeStackChainBuffer(Throwable e,Class<?> refType){
-//        String callClassname = refType.getName();
-//        if(null == e){
-//            return StringServant.Instance.format("CallClass:[{0}] Stack:[NULL]",callClassname);
-//        }
-//
-//        StackTraceElement[] stes = e.getStackTrace();
-//        StringBuilder sb = new StringBuilder();
-//        for(StackTraceElement ste : stes){
-//            if ((null != refType) && !ste.getClassName().equals(callClassname)) {
-//                continue;
-//            }
-//            sb.append(ste.getClassName()).append(".").append(ste.getMethodName())
-//                    .append("(")
-//                    .append(ste.getFileName()).append(":").append(ste.getLineNumber())
-//                    .append(") -> ");
-//        }
-//        int len = sb.length();
-//        if(0 != len){
-//            sb.delete(len -4,len);
-//            return sb.toString();
-//        }
-//        return "Stack:[NULL]";
-//    }
 
     public String excp2LogMsg(Throwable e, Class<?> refType){
         String calledClassname = refType.getName();
@@ -119,7 +86,7 @@ public class ThrowableServant {
         }
 
         throwBuffer = StringServant.Instance.format(
-                "SystemException -> Msg:[{0}] Cause:[Type:[{1}],Msg:[{2}]] Stack:[{3}]",
+                "Type:{1} -> Msg:{0} Cause:[{2}] Stack:[{3}]",
                 e.getMessage(),e.getClass().getName(),findThrowCauseMsg(e),printThrowStackTrace(e));
         return throwBuffer;
     }
@@ -140,21 +107,6 @@ public class ThrowableServant {
         pw.close();
         return bo.toString();
     }
-
-    /**
-     * 将异常的堆栈信息转为行式的字符串
-//     * @param e 异常
-     * @return 异常的字符串描述
-     */
-//    public String printThrowStackTraceForLineStyle(Throwable e) {
-//        if(null == e) {
-//            return "NULL";
-//        }
-//        String line = printThrowStackTrace(e);
-//        return line.replace("\r\n","")
-//                .replace("\n","")
-//                .replace("  ","");
-//    }
 
     public void throwDisplayException(Class<?> refType, Throwable interThrow, String brief, String fmt, Object...obj) {
         String msg = StringServant.Instance.format(fmt,obj);

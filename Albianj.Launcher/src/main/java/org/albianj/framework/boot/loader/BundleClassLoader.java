@@ -47,6 +47,7 @@ import java.util.jar.JarInputStream;
 public class BundleClassLoader extends ClassLoader {
     private String bundleName = null;
     private ClassLoader parent = null;
+    private  boolean isFilter = false;
     /**
      * key - full classname
      * value - class file metadata
@@ -56,17 +57,27 @@ public class BundleClassLoader extends ClassLoader {
     protected TypeDiredTree typeDiredTree = null;
     protected Set<String> jarFileSet = null;
 
-    protected BundleClassLoader(String bundleName) {
+    /**
+     *
+     * @param bundleName
+     * @param openFilterNotExistClassThrowable 是否过滤确实不存在的class的爆出异常
+     */
+    protected BundleClassLoader(String bundleName,boolean openFilterNotExistClassThrowable) {
         super(BundleClassLoader.class.getClassLoader());
         this.parent = BundleClassLoader.class.getClassLoader();//Thread.currentThread().getContextClassLoader();
         this.bundleName = bundleName;
 //        totalFileMetadatas = new HashMap<>();
         jarFileSet = new HashSet<>();
         typeDiredTree = new TypeDiredTree();
+        this.isFilter = openFilterNotExistClassThrowable;
+    }
+
+    public static BundleClassLoader newInstance(String bundleName,boolean openFilterNotExistClassThrowable) {
+        return new BundleClassLoader(bundleName,openFilterNotExistClassThrowable);
     }
 
     public static BundleClassLoader newInstance(String bundleName) {
-        return new BundleClassLoader(bundleName);
+        return new BundleClassLoader(bundleName,true);
     }
 
     public String getBundleName() {
@@ -81,7 +92,8 @@ public class BundleClassLoader extends ClassLoader {
                 .byCalled(this.getClass())
                 .takeBrief("Loading Class")
                 .build().toLogger();
-        if(name.equals("com.mysql.jdbc.LocalizedErrorMessages_zh")) {
+        //filter the jdbc exception
+        if(isFilter && (FilterNotExistTypeNames.isFilter(name))) {
             return null;
         }
         return loadClass(name, false);
@@ -89,6 +101,8 @@ public class BundleClassLoader extends ClassLoader {
 
     @Override
     protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
+
+
         Class clzz = null;
         clzz = findLoadedClass(name);
         if (clzz != null) {
@@ -132,14 +146,14 @@ public class BundleClassLoader extends ClassLoader {
                 return (clzz);
             }
         } catch (ClassNotFoundException e) {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
-                    .aroundBundle(this.bundleName)
-                    .atLevel(LoggerLevel.Error)
-                    .byCalled(this.getClass())
-                    .withCause(e)
-                    .forSessionId("loadclass")
-                    .takeBrief("Loading Class")
-                    .build().toLogger();
+//            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
+//                    .aroundBundle(this.bundleName)
+//                    .atLevel(LoggerLevel.Error)
+//                    .byCalled(this.getClass())
+//                    .withCause(e)
+//                    .forSessionId("loadclass")
+//                    .takeBrief("Loading Class")
+//                    .build().toLogger();
         }
 
         try {

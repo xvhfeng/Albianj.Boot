@@ -51,11 +51,10 @@ public class ApplicationContext {
     private String workFolder = null;
     private String logsPath = null;
     private boolean isOpenConsole = false;
-//    private Map<String, BundleConf> attAttrs = new HashMap<>();
+    private String level = "DEBUG";
     private Map<String, BundleContext> bundleContextMap = new HashMap<>();
     private Thread currentThread ;
     private boolean isWindows;
-//    private ILogger logger;
 
     protected ApplicationContext() {
         currentThread = Thread.currentThread();
@@ -82,9 +81,10 @@ public class ApplicationContext {
         return this;
     }
 
-    public ApplicationContext setLoggerAttr(String logsPath, boolean isOpenConsole) {
+    public ApplicationContext setLoggerAttr(String logsPath,LoggerLevel level, boolean isOpenConsole) {
         this.logsPath = logsPath;
         this.isOpenConsole = isOpenConsole;
+        this.level = level.getTag();
         return this;
     }
 
@@ -163,16 +163,6 @@ public class ApplicationContext {
             this.phase = Phase.PrepareEnd;
             buildApplicationRuntime(args);
             this.phase = Phase.Run;
-//            for(int i = 0; i <200000; i++){
-//                LogServant.Instance.newLogPacket()
-//                        .forSessionId("StartupThread")
-//                        .atLevel(LoggerLevel.Info)
-//                        .byCalled(this.getClass())
-//                        .takeBrief("Albianj Application Startup")
-//                        .addMessage("{2} Albianj application startuping by using RuntimeLogger with folder -> {0} and {1} open ConsoleLogger.",
-//                                logsPath, isOpenConsole ? "" : "not",i)
-//                        .toLogger();
-//            }
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             try {
@@ -188,13 +178,13 @@ public class ApplicationContext {
         if (StringServant.Instance.isNullOrEmptyOrAllSpace(logsPath)) {
             ThrowableServant.Instance.throwDisplayException(this.getClass(), null,
                     "Startup Argument Error.",
-                    "Argument 'logsPath' is not setting and OPS(Yes,Have and only have caicai.) not allow use default value,so must setting it.");
+                    "Argument 'logsPath' is not setting and OPS(Yes,Only caicai) not allow use default value,so must setting it.");
         }
 
         /**
          * first init initLogger，but named Runtime and replace it when init end.
          */
-        LogServant.Instance.init(LogServant.RuntimeLogNameDef, logsPath, LogServant.RuntimeLogLevelDef, isOpenConsole);
+        LogServant.Instance.init(LogServant.RuntimeLogNameDef, logsPath,this.level, isOpenConsole);
 
         LogServant.Instance.newLogPacketBuilder()
                 .forSessionId("StartupThread")

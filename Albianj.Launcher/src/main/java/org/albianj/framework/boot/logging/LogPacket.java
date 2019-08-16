@@ -36,9 +36,16 @@ public class LogPacket {
     private String bundleName;
     private Thread refThread;
     private long  debugIdx = 0;
+    private StackTraceElement rbp = null;
 
     public LogPacket(){
         this.datetimeMS = System.currentTimeMillis();
+        StackTraceElement[] stacks =  Thread.currentThread().getStackTrace();
+        if(stacks.length < 4) {
+            rbp = stacks[stacks.length];
+        } else {
+            rbp = stacks[3];
+        }
     }
 
     /**
@@ -173,14 +180,13 @@ public class LogPacket {
 
         Thread rt = null == this.refThread ? Thread.currentThread() : this.refThread;
         String msg = StringServant.Instance.format(
-                "{12} {0} Bundle:[{1}] RefType:[{2}] Msg:[{3}] Brief:[{4}] Secret:[{5}] Session:[{6}] Level:[{7}] Thread:[{8},{9}] {10}.{11}",
+                "{0} [{7}] Oper:{6} Bundle:{1} Thread:[{8},{9}] RBP:[{13}.{14}@{15}:{16}] Ref:{2} Brief:[{4}] Msg:{3} Secret:{5} {10}.{11}",
                 DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
                 bundleName,refType.getName(),logMsg,brief,secretMsg,
-                sessionId,level.getTag(),
-                rt.getId(),rt.getName(),
+                sessionId,level.getTag(), rt.getId(),rt.getName(),
                 ThrowableServant.Instance.excp2LogMsg(cause,refType),
-                System.lineSeparator(),
-                this.debugIdx);
+                System.lineSeparator(), this.debugIdx,
+                rbp.getClassName(),rbp.getMethodName(),rbp.getFileName(),rbp.getLineNumber());
 
         return msg;
     }

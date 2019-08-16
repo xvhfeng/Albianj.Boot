@@ -64,8 +64,21 @@ public class AlbianSpxClassLoader extends BundleClassLoader {
     private Map<String, TypeFileMetadata> mapTypesInSpxLib;
 
     protected AlbianSpxClassLoader(String bundleName) {
-        super(bundleName);
+        super(bundleName,true);
         mapTypesInSpxLib = new HashMap<>();
+    }
+
+    protected AlbianSpxClassLoader(String bundleName,boolean isFilterNotExistThrow) {
+        super(bundleName,isFilterNotExistThrow);
+        mapTypesInSpxLib = new HashMap<>();
+    }
+
+    public static AlbianSpxClassLoader newInstance(String bundleName,boolean openFilterNotExistClassThrowable) {
+        return new AlbianSpxClassLoader(bundleName,openFilterNotExistClassThrowable);
+    }
+
+    public static AlbianSpxClassLoader newInstance(String bundleName) {
+        return new AlbianSpxClassLoader(bundleName,true);
     }
 
     @Override
