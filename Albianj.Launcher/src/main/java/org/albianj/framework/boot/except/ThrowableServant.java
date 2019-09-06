@@ -75,7 +75,7 @@ public class ThrowableServant {
     public String excp2LogMsg(Throwable e, Class<?> refType){
         String calledClassname = refType.getName();
         if(null == e) {
-            return "Throwable:[NULL]";
+            return "Throw:[NULL]";
         }
         Throwable t = null;
         String throwBuffer = null;
@@ -86,7 +86,7 @@ public class ThrowableServant {
         }
 
         throwBuffer = StringServant.Instance.format(
-                "Type:{1} -> Msg:{0} Cause:[{2}] Stack:[{3}]",
+                "Throw:{1} -> {0} Cause:{2} Stack:[{3}]",
                 e.getMessage(),e.getClass().getName(),findThrowCauseMsg(e),printThrowStackTrace(e));
         return throwBuffer;
     }

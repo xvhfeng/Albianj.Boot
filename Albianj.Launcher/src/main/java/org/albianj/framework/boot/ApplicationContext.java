@@ -55,12 +55,14 @@ public class ApplicationContext {
     private Map<String, BundleContext> bundleContextMap = new HashMap<>();
     private Thread currentThread ;
     private boolean isWindows;
+    private Map<String,Object> sharedMap;
 
     protected ApplicationContext() {
         currentThread = Thread.currentThread();
         String system = System.getProperty("os.name");
         this.isWindows = system.toLowerCase().contains("windows");
         this.phase = Phase.Prepare;
+        sharedMap = new HashMap<>();
     }
 
     public boolean isWindows() {
@@ -93,7 +95,13 @@ public class ApplicationContext {
             BundleContext preBctx = bundleContextMap.get(bctx.getBundleName());
             if(Phase.Run ==  preBctx.getPhase()) {
                // first not support for hot loading
-
+                LogServant.Instance.newLogPacketBuilder()
+                        .forSessionId("StartupThread")
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(refType)
+                        .takeBrief("BundleContext Not Exist")
+                        .addMessage("Bundle -> {0} is running now,so not added it.",bctx.getBundleName())
+                        .build().toLogger();
             }
 
         }
@@ -103,6 +111,14 @@ public class ApplicationContext {
 
     public boolean isBundleExist(String bundleName) {
         return bundleContextMap.containsKey(bundleName);
+    }
+
+    /**
+     * 已经存在了bundle
+     * @return
+     */
+    public boolean hasAnyBundle(){
+        return 0 != bundleContextMap.size();
     }
 
     /**
@@ -160,10 +176,16 @@ public class ApplicationContext {
 
     public void run(String[] args) {
         try {
-            this.phase = Phase.PrepareEnd;
-            buildApplicationRuntime(args);
-            this.phase = Phase.Run;
-            Thread.currentThread().join();
+            if(Phase.Run == this.phase) {
+                return;
+            }
+
+            if(Phase.Prepare == this.phase) {
+                this.phase = Phase.PrepareEnd;
+                buildApplicationRuntime(args);
+                this.phase = Phase.Run;
+                Thread.currentThread().join();
+            }
         } catch (InterruptedException e) {
             try {
                 Thread.sleep(1000); //wait io flush
@@ -291,14 +313,69 @@ public class ApplicationContext {
         }
     }
 
-    public void exitSystem(int st) {
+    /**
+     * 直接退出进程
+     * @param sessionId
+     * @param bctx
+     * @param refType
+     * @param code
+     */
+    public void exit(String sessionId,BundleContext bctx,Class<?> refType,int code) {
+        LogServant.Instance.newLogPacketBuilder()
+                .forSessionId(sessionId)
+                .atLevel(LoggerLevel.Mark)
+                .byCalled(refType)
+                .takeBrief("Exit Application")
+                .addMessage("exit application after 5s by in -> {0} at bundle -> {1} with code -> {2}.",
+                        refType.getName(),bctx.getBundleName(),code)
+                .build().toLogger();
+
         try {
             Thread.sleep(5000); //wait io flush
-            currentThread.interrupt();
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            try {
+                currentThread.interrupt();
+            }catch (Exception e){
+
+            }
         }
-        System.exit(st);
+        try {
+            LogServant.Instance.newLogPacketBuilder()
+                    .forSessionId(sessionId)
+                    .atLevel(LoggerLevel.Mark)
+                    .byCalled(refType)
+                    .takeBrief("Exit Application")
+                    .addMessage("exit application just now by in -> {0} at bundle -> {1} with code -> {2}.",
+                            refType.getName(), bctx.getBundleName(), code)
+                    .build().toLogger();
+        }catch (Exception e){
+
+        }
+        System.exit(code);
+    }
+
+    /**
+     * 放置bundle之间共享的变量
+     * 变量值只能是简单变量，或者是由ext classloader加载的对象
+     * @param key
+     * @param val
+     */
+    public void putSharedItem(String key,Object val){
+        sharedMap.put(key,val);
+    }
+
+    public Object getSharedValue(String key){
+        return  sharedMap.get(key);
+    }
+
+    public void removeSharedItem(String key){
+        sharedMap.remove(key);
+    }
+
+    public Map<String,Object> getSharedPair(){
+        return sharedMap;
     }
 
     private XmlParserContext loadAppConf(String sessionId, String confFolder) {
@@ -338,8 +415,6 @@ public class ApplicationContext {
         } else {
             LoggerConf logAttr = parserAppRuntimeLoggerConf(xmlParserCtx, loggersNode, logsPath);
             appConf.setRootLoggerAttr(logAttr);
-//            Map<String,ILoggerConf> logsAttr = parserLoggersConf(xmlParserCtx,loggersNode,logsPath);
-//            bootAttr.setLoggerAttrs(logsAttr);
         }
         Map<String, BundleConf> bundles = parserChildBundlesConf(xmlParserCtx);
         if (!CollectServant.Instance.isNullOrEmpty(bundles)) {

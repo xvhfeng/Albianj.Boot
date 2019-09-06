@@ -149,14 +149,14 @@ public class LogPacketBuilder {
         }
         LogPacket packet = new LogPacket();
         packet.setRefThread(this.refThread);
-        packet.setBrief(StringServant.Instance.isNullOrEmptyOrAllSpace(this.brief) ? "NULL" : this.brief);
+        packet.setBrief(StringServant.Instance.isNullOrEmptyOrAllSpace(this.brief) ? "EmptyString" : this.brief);
         packet.setThrow(this.isThrow);
         packet.setCause(this.cause);
         packet.setBundle(bName);
         packet.setCalled(this.refType);
         packet.setLevel(this.level);
-        packet.setMsg(StringServant.Instance.isNullOrEmptyOrAllSpace(this.logMsg) ? "NULL" : this.logMsg);
-        packet.setSecret(StringServant.Instance.isNullOrEmptyOrAllSpace(this.secretMsg) ? "NULL" : this.secretMsg);
+        packet.setMsg(StringServant.Instance.isNullOrEmptyOrAllSpace(this.logMsg) ? "EmptyString" : this.logMsg);
+        packet.setSecret(StringServant.Instance.isNullOrEmptyOrAllSpace(this.secretMsg) ? "EmptyString" : this.secretMsg);
         packet.setSessionId(this.sessionId);
         return packet;
     }

@@ -101,8 +101,6 @@ public class BundleClassLoader extends ClassLoader {
 
     @Override
     protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
-
-
         Class clzz = null;
         clzz = findLoadedClass(name);
         if (clzz != null) {
@@ -181,21 +179,6 @@ public class BundleClassLoader extends ClassLoader {
         }
         return clzz;
     }
-
-
-//    @Override
-//    public URL getResource(String name) {
-//        URL url = super.getResource(name);
-//        LogServant.Instance.newLogPacketBuilder().addMessage("find resource -> {0} bu url -> {1}",
-//                name,url)
-//                .aroundBundle(this.bundleName)
-//                .atLevel(LoggerLevel.Debug)
-//                .forSessionId("LoadResource")
-//                .byCalled(this.getClass())
-//                .takeBrief("Loading Resource By Scan Jar")
-//                .build().toLogger();
-//        return url;
-//    }
 
     @Override
     protected URL findResource(String name) {
@@ -387,7 +370,7 @@ public class BundleClassLoader extends ClassLoader {
         }
     }
 
-    public void scanJarFolder(String fromFolder,String jarFinder,  TypeDiredTree typeDiredTree) {
+    public void scanJarFolder(String fromFolder, String jarFinder, final boolean isScanChildFolder, TypeDiredTree typeDiredTree) {
         LogServant.Instance.newLogPacketBuilder().addMessage("Scan jar folder -> {0}",jarFinder)
                 .aroundBundle(this.bundleName)
                 .atLevel(LoggerLevel.Debug)
@@ -404,7 +387,7 @@ public class BundleClassLoader extends ClassLoader {
         File[] files = finder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".jar");
+                return isScanChildFolder ? f.isDirectory() || f.getName().endsWith(".jar") : f.getName().endsWith(".jar");
             }
         });
         if(null == files || 0 == files.length){
@@ -412,7 +395,7 @@ public class BundleClassLoader extends ClassLoader {
         }
         for (File f : files) {
             if (f.isDirectory()) {
-                scanJarFolder(fromFolder,f.getAbsolutePath(), typeDiredTree);
+                scanJarFolder(fromFolder,f.getAbsolutePath(),isScanChildFolder, typeDiredTree);
             }
             if (f.isFile()) {
                 try {
@@ -490,13 +473,13 @@ public class BundleClassLoader extends ClassLoader {
      * @param classesFolder
      * @param libFolder
      */
-    private void scanAllClass(String binFolder, String classesFolder, String libFolder,boolean isPrintScanClasses) {
+    private void scanAllClass(String binFolder,boolean isScanBinChildFolder, String classesFolder, String libFolder,boolean isScanLibChildFolder, boolean isPrintScanClasses) {
         /**
          * because load priority,so  low priority loading before high priority
          */
-        scanJarFolder("lib",libFolder, typeDiredTree);
+        scanJarFolder("lib",libFolder,isScanBinChildFolder, typeDiredTree);
         scanClassesFile("classes",classesFolder, classesFolder, typeDiredTree);
-        scanJarFolder("bin",binFolder, typeDiredTree);
+        scanJarFolder("bin",binFolder,isScanLibChildFolder, typeDiredTree);
 
         LogServant.Instance.newLogPacketBuilder().addMessage("Scan All Class Count-> {0}.",
                 typeDiredTree.getSize())
@@ -527,9 +510,9 @@ public class BundleClassLoader extends ClassLoader {
      *
      */
     public void scanAllClass(BundleContext bctx) {
-        scanAllClass(bctx.getBinFolder(),
+        scanAllClass(bctx.getBinFolder(),bctx.isScanBinChildFolder(),
                 bctx.getClassesFolder(),
-                bctx.getLibFolder(),
+                bctx.getLibFolder(),bctx.isScanLibChildFolder(),
                 bctx.isPrintScanClasses());
     }
 

@@ -180,7 +180,8 @@ public class LogPacket {
 
         Thread rt = null == this.refThread ? Thread.currentThread() : this.refThread;
         String msg = StringServant.Instance.format(
-                "{0} [{7}] Oper:{6} Bundle:{1} Thread:[{8},{9}] RBP:[{13}.{14}@{15}:{16}] Ref:{2} Brief:[{4}] Msg:{3} Secret:{5} {10}.{11}",
+//                "{0} | {7} | Oper:{6} | Bundle:{1} | Thread:{9}@{8} | RBP:{13}.{14}@{15}:{16} | Ref:{2} | Brief:{4} | Msg:{3} | Secret:{5} | {10}.{11}",
+                "{0} | {7} | Id:{6} | Bundle:{1} | Thread:{9}@{8} | Ref:{13}.{14}@{15}:{16} | Brief:{4} | Msg:{3} | Secret:{5} | {10}.{11}",
                 DailyServant.Instance.datetimeLongStringWithMillis(this.datetimeMS),
                 bundleName,refType.getName(),logMsg,brief,secretMsg,
                 sessionId,level.getTag(), rt.getId(),rt.getName(),
