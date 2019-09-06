@@ -31,6 +31,8 @@ public class BundleContext {
     private String libFolder;
     private String confFolder;
     private String appsFolder;
+    private boolean isScanBinChildFolder = true;
+    private boolean isScanLibChildFolder = true;
     private Phase phase;
     private String[] args;
     private boolean isPrintScanClasses = false;
@@ -61,13 +63,15 @@ public class BundleContext {
         return this;
     }
 
-    public BundleContext setBinFolder(String binFolder){
+    public BundleContext setBinFolder(String binFolder,boolean isScanBinChildFolder){
         this.binFolder = binFolder.endsWith(File.separator) ? binFolder : binFolder +File.separator;
+        this.isScanBinChildFolder = isScanBinChildFolder;
         return this;
     }
 
-    public BundleContext setLibFolder(String libFolder){
+    public BundleContext setLibFolder(String libFolder,boolean isScanLibChildFolder){
         this.libFolder = libFolder.endsWith(File.separator) ? libFolder : libFolder +File.separator;
+        this.isScanLibChildFolder = isScanLibChildFolder;
         return this;
     }
 
@@ -103,6 +107,15 @@ public class BundleContext {
     public BundleContext setFilterNotExistTypeThrow(boolean filterNotExistTypeThrow) {
         isFilterNotExistTypeThrow = filterNotExistTypeThrow;
         return this;
+    }
+
+
+    public boolean isScanBinChildFolder() {
+        return isScanBinChildFolder;
+    }
+
+    public boolean isScanLibChildFolder() {
+        return isScanLibChildFolder;
     }
 
     /**
