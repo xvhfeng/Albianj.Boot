@@ -24,3 +24,6 @@
 hs_err_pid*
 out
 target
+
+/out
+/target
