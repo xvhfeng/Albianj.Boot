@@ -111,15 +111,23 @@ public class FileServant {
         List<File> rcFiles = new ArrayList<>();
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
-            public boolean accept(File dir, String name) {
-                return dir.isDirectory() || (name.endsWith(suffix));
+            public boolean accept(File f, String name) {
+                String fullName = StringServant.Instance.join(f.getAbsolutePath(),File.separator,name);
+                File ff = new File(fullName);
+                if(ff.exists() && ff.isDirectory()) {
+                    return true;
+                }
+
+                return name.endsWith(suffix);
             }
         });
         if(null != files || 0 != files.length){
             for (File f: files) {
                 if(f.isDirectory()) {
                     List<File> tmpFiles = findFileBySuffix( f.getName(), suffix);
-                    rcFiles.addAll(tmpFiles);
+                    if(null != tmpFiles && 0 != tmpFiles.size()) {
+                        rcFiles.addAll(tmpFiles);
+                    }
                 }else {
                     rcFiles.add(f);
                 }

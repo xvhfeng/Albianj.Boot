@@ -53,7 +53,6 @@ public class BundleClassLoader extends ClassLoader {
      * value - class file metadata
      */
 
-//    protected Map<String,TypeFileMetadata> totalFileMetadatas = null;
     protected TypeDiredTree typeDiredTree = null;
     protected Set<String> jarFileSet = null;
 
@@ -66,7 +65,6 @@ public class BundleClassLoader extends ClassLoader {
         super(BundleClassLoader.class.getClassLoader());
         this.parent = BundleClassLoader.class.getClassLoader();//Thread.currentThread().getContextClassLoader();
         this.bundleName = bundleName;
-//        totalFileMetadatas = new HashMap<>();
         jarFileSet = new HashSet<>();
         typeDiredTree = new TypeDiredTree();
         this.isFilter = openFilterNotExistClassThrowable;
@@ -118,7 +116,6 @@ public class BundleClassLoader extends ClassLoader {
          * loader must loading by app or extloader
          */
         if (!name.startsWith("org.albianj.framework.boot")) {
-//            if (totalFileMetadatas.containsKey(name)) {
             if(null != typeDiredTree.findNode(name)) {
                 clzz = loadClassFromTypeMetadata(name);
             }
@@ -144,14 +141,6 @@ public class BundleClassLoader extends ClassLoader {
                 return (clzz);
             }
         } catch (ClassNotFoundException e) {
-//            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
-//                    .aroundBundle(this.bundleName)
-//                    .atLevel(LoggerLevel.Error)
-//                    .byCalled(this.getClass())
-//                    .withCause(e)
-//                    .forSessionId("loadclass")
-//                    .takeBrief("Loading Class")
-//                    .build().toLogger();
         }
 
         try {
@@ -167,15 +156,29 @@ public class BundleClassLoader extends ClassLoader {
                 throw new ClassNotFoundException(name);
             }
         } catch (Exception e) {
-            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
-                    .aroundBundle(this.bundleName)
-                    .atLevel(LoggerLevel.Error)
-                    .byCalled(this.getClass())
-                    .alwaysThrow(true)
-                    .withCause(e)
-                    .forSessionId("loadclass")
-                    .takeBrief("Loading Class")
-                    .build().toLogger();
+            /**
+             * filter the javabean load BeanInfo or Customizer autoly
+             */
+            if(name.endsWith("BeanInfo") || name.endsWith("Customizer")) {
+                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was not found.if you care this exception,please use CLASSPATH for loading.", name)
+                        .aroundBundle(this.bundleName)
+                        .atLevel(LoggerLevel.Warn)
+                        .byCalled(this.getClass())
+                        .withCause(e)
+                        .forSessionId("loadclass")
+                        .takeBrief("Loading Class")
+                        .build().toLogger();
+            } else {
+                LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0} was system class,so loading by SystemClassLoader,but loading fail.", name)
+                        .aroundBundle(this.bundleName)
+                        .atLevel(LoggerLevel.Error)
+                        .byCalled(this.getClass())
+                        .alwaysThrow(true)
+                        .withCause(e)
+                        .forSessionId("loadclass")
+                        .takeBrief("Loading Class")
+                        .build().toLogger();
+            }
         }
         return clzz;
     }
@@ -241,7 +244,14 @@ public class BundleClassLoader extends ClassLoader {
         TypeFileMetadata cfm = typeDiredTree.findNode(name); //totalFileMetadatas.get(name);
         Class<?> clzz = null;
         if (cfm == null) {
-
+            LogServant.Instance.newLogPacketBuilder().addMessage("Class -> {0}'s TypeFileMetadate not found .", name)
+                    .aroundBundle(this.bundleName)
+                    .atLevel(LoggerLevel.Error)
+                    .byCalled(this.getClass())
+                    .forSessionId("loadclass")
+                    .takeBrief("Loading Class")
+                    .build().toLogger();
+            return null;
         }
 
         if (null != cfm.getType()) {
@@ -359,10 +369,6 @@ public class BundleClassLoader extends ClassLoader {
                         TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(TypeFileOpt.Resource,".dtd",relFileName, bytes, rootFinder, false,fromFolder);
                         typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
                     }
-
-//                    TypeFileMetadata cfm = TypeFileMetadata.makeClassFileMetadata(relFileName, bytes, rootFinder, false,fromFolder);
-//                    cfm.setType(cla);
-//                    typeDiredTree.addNode(cfm.getFullClassNameWithoutSuffix(),cfm);
                 } catch (Exception e) {
 
                 }
@@ -532,64 +538,6 @@ public class BundleClassLoader extends ClassLoader {
      * @param isReplaceIfExist，当为true，参数map为master，其将替换原total中的类（如果有的话)
      */
     protected void mergerTypeFileMetadata(Map<String,TypeFileMetadata> map,boolean isReplaceIfExist){
-//        if(isReplaceIfExist) {
            this.typeDiredTree.addNodes(map);
-//        } else {
-//            map.putAll(this.totalFileMetadatas);
-//            this.totalFileMetadatas = map;
-//        }
     }
-//
-//    /**
-//     * 根据指定的Anno来获取所有的class，不包括抽象类与接口
-//     * @param markAnno 被标记的Tag
-//     * @param unmarkAnno 未被标记的Tag
-//     * @return
-//     */
-//    public Map<String,TypeFileMetadata> findNormalTypeWithAnno(Class<? extends Annotation> markAnno,Class<? extends Annotation> unmarkAnno){
-//        Map<String,TypeFileMetadata> map = new HashMap<>();
-//        findNormalTypeWithParentAndAnno(null,markAnno,unmarkAnno,totalFileMetadatas,map);
-//        return map;
-//    }
-//
-//    /**
-//     * 根据指定的parent类/接口获取所有的普通class，不包括抽象子类与子接口
-//     * @param parent
-//     * @return
-//     */
-//    public Map<String,TypeFileMetadata> findNormalTypeWithParent(Class<?> parent){
-//        Map<String,TypeFileMetadata> map = new HashMap<>();
-//        findNormalTypeWithParentAndAnno(parent,null,null,totalFileMetadatas,map);
-//        return map;
-//    }
-//
-//    public void findNormalTypeWithParentAndAnno(Class<?> parent,
-//                                             Class<? extends Annotation> markAnno,
-//                                             Class<? extends Annotation> unmarkAnno,
-//                                             Map<String,TypeFileMetadata> from,
-//                                             Map<String,TypeFileMetadata> to) {
-//        for(Map.Entry<String,TypeFileMetadata> entry : from.entrySet()){
-//            TypeFileMetadata tfm = entry.getValue();
-//            Class<?> clzz = tfm.getType();
-//
-//            /**
-//             * is normal class
-//             * and mark by markAnno
-//             * and not mark by unmarkAnno
-//             * and not in result
-//             */
-//            boolean isConform = TypeServant.Instance.isNormalClass(clzz)
-//                    && ((null == parent) ? true :  tfm.getType().isAssignableFrom(parent))
-//                    && ((null == markAnno) ? true : clzz.isAnnotationPresent(markAnno))
-//                    && ((null == unmarkAnno) ? true :  !clzz.isAnnotationPresent(unmarkAnno))
-//                    && (!to.containsKey(tfm.mkKey()));
-//            if(isConform){
-//                to.put(tfm.mkKey(), tfm);
-//            }
-//        }
-//    }
-//
-
-
-
 }
