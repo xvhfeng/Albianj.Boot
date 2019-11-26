@@ -9,6 +9,8 @@ import org.albianj.framework.boot.logging.LogServant;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * albianj bundle的上下文
@@ -37,6 +39,8 @@ public class BundleContext {
     private String[] args;
     private boolean isPrintScanClasses = false;
     private boolean isFilterNotExistTypeThrow = true;
+    private Map<String,Object> namedArgs = new HashMap<>();
+
 
     public BundleContext setBundleName(String name){
         this.bundleName = name;
@@ -234,6 +238,15 @@ public class BundleContext {
     public BundleContext setArgs(String[] args) {
         this.args = args;
         return this;
+    }
+
+    public BundleContext putNamedArg(String name,Object val) {
+        this.namedArgs.put(name,val);
+        return this;
+    }
+
+    public Object getNamedArgValue(String name){
+        return this.namedArgs.get(name);
     }
 
     public void startup(final String[] args){
